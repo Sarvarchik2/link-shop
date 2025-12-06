@@ -37,7 +37,7 @@
           class="filter-btn"
           :class="{ active: selectedStatus === status.value }"
           @click="selectedStatus = status.value"
-        >
+      >
           <span class="filter-icon">{{ status.icon }}</span>
           {{ status.label }}
       </button>

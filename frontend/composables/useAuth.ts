@@ -3,16 +3,16 @@ export const useAuth = () => {
     const user = useState('user', () => null)
 
     const login = async (phone: string, password: string, redirect: boolean = true) => {
-        const formData = new FormData()
-        formData.append('username', phone)
-        formData.append('password', password)
+            const formData = new FormData()
+            formData.append('username', phone)
+            formData.append('password', password)
 
-        const data: any = await $fetch('http://localhost:8000/token', {
-            method: 'POST',
-            body: formData
-        })
-        token.value = data.access_token
-        await fetchUser()
+            const data: any = await $fetch('http://localhost:8000/token', {
+                method: 'POST',
+                body: formData
+            })
+            token.value = data.access_token
+            await fetchUser()
         useToast().success('Welcome back!')
         if (redirect) {
             navigateTo('/')
@@ -20,14 +20,14 @@ export const useAuth = () => {
     }
 
     const register = async (phone: string, password: string, first_name: string, last_name: string) => {
-        const data: any = await $fetch('http://localhost:8000/register', {
-            method: 'POST',
-            body: { phone, password, first_name, last_name }
-        })
-        token.value = data.access_token
-        await fetchUser()
+            const data: any = await $fetch('http://localhost:8000/register', {
+                method: 'POST',
+                body: { phone, password, first_name, last_name }
+            })
+            token.value = data.access_token
+            await fetchUser()
         useToast().success('Welcome! Account created successfully')
-        navigateTo('/')
+            navigateTo('/')
     }
 
     const fetchUser = async () => {

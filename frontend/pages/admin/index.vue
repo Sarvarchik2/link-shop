@@ -2,8 +2,8 @@
   <div class="dashboard-page">
     <div class="dashboard-header">
       <div class="header-left">
-        <h1 class="page-title">Dashboard</h1>
-        <p class="page-subtitle">Welcome back! Here's what's happening with your store.</p>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-subtitle">Welcome back! Here's what's happening with your store.</p>
       </div>
       <div class="header-right">
         <span class="current-date">{{ formatDate(new Date()) }}</span>
@@ -353,9 +353,7 @@ const formatDate = (date) => {
 
 <style scoped>
 .dashboard-page {
-  padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .dashboard-header {
@@ -753,7 +751,6 @@ const formatDate = (date) => {
 }
 
 @media (max-width: 768px) {
-  .dashboard-page { padding: 16px; }
   .dashboard-header { flex-direction: column; gap: 12px; }
   .page-title { font-size: 1.75rem; }
   .current-date { align-self: flex-start; }

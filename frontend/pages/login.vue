@@ -52,7 +52,7 @@ const { login } = useAuth()
 
 const handleLogin = async () => {
   try {
-    await login(phone.value, password.value)
+  await login(phone.value, password.value)
   } catch (e) {
     useToast().error('Invalid phone or password')
   }

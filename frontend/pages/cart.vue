@@ -5,11 +5,11 @@
     
     <!-- Mobile Header -->
     <header class="cart-header mobile-header">
-      <button @click="$router.back()" class="back-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button @click="$router.back()" class="back-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
-        </svg>
-      </button>
+          </svg>
+        </button>
       <h1 class="cart-title">Cart</h1>
       <div class="header-spacer"></div>
     </header>
@@ -181,7 +181,7 @@ const handleCheckout = () => {
     navigateTo('/login')
     return
   }
-  
+
   if (items.value.length === 0) {
     toast.warning('Your cart is empty')
     return

@@ -1,13 +1,29 @@
 <template>
   <div class="orders-page">
+    <div class="page-header">
     <h1 class="page-title">Orders</h1>
+      <div class="filters">
+        <button 
+          v-for="status in statuses" 
+          :key="status.value"
+          @click="selectedStatus = status.value"
+          class="filter-btn"
+          :class="{ active: selectedStatus === status.value, [status.value]: true }"
+        >
+          {{ status.label }}
+          <span v-if="getStatusCount(status.value) > 0" class="filter-count">
+            {{ getStatusCount(status.value) }}
+          </span>
+        </button>
+      </div>
+    </div>
     
-    <div v-if="!orders || orders.length === 0" class="empty-state">
+    <div v-if="!filteredOrders || filteredOrders.length === 0" class="empty-state">
       <p>No orders found.</p>
     </div>
     
     <div v-else class="orders-list">
-      <div v-for="order in orders" :key="order.id" class="order-card">
+      <div v-for="order in filteredOrders" :key="order.id" class="order-card">
         <div class="order-header" @click="toggleOrder(order.id)">
           <div class="order-main-info">
             <span class="order-id">#{{ order.id }}</span>
@@ -16,21 +32,21 @@
           <div class="order-customer">
             <span class="customer-name">{{ order.user?.first_name }} {{ order.user?.last_name }}</span>
             <span class="customer-phone">{{ order.user?.phone }}</span>
-          </div>
+      </div>
           <div class="order-total">${{ order.total_price.toFixed(2) }}</div>
-          <select 
-            :value="order.status" 
+              <select 
+                :value="order.status" 
             @click.stop
-            @change="updateStatus(order.id, $event.target.value)"
-            class="status-select"
+                @change="updateStatus(order.id, $event.target.value)"
+                class="status-select"
             :class="order.status"
-          >
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipping">Shipping</option>
+              >
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="shipping">Shipping</option>
             <option value="delivered">Delivered</option>
             <option value="cancelled">Cancelled</option>
-          </select>
+              </select>
           <button class="expand-btn" :class="{ expanded: expandedOrder === order.id }">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="6 9 12 15 18 9"></polyline>
@@ -108,11 +124,33 @@ definePageMeta({
 
 const { token } = useAuth()
 const expandedOrder = ref(null)
+const selectedStatus = ref('all')
+
+const statuses = [
+  { value: 'all', label: 'All' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'processing', label: 'Processing' },
+  { value: 'shipping', label: 'Shipping' },
+  { value: 'delivered', label: 'Delivered' },
+  { value: 'cancelled', label: 'Cancelled' }
+]
 
 const { data: orders, refresh } = await useFetch('http://localhost:8000/admin/orders', {
   headers: { Authorization: `Bearer ${token.value}` },
   server: false
 })
+
+const filteredOrders = computed(() => {
+  if (!orders.value) return []
+  if (selectedStatus.value === 'all') return orders.value
+  return orders.value.filter(o => o.status === selectedStatus.value)
+})
+
+const getStatusCount = (status) => {
+  if (!orders.value) return 0
+  if (status === 'all') return orders.value.length
+  return orders.value.filter(o => o.status === status).length
+}
 
 const toggleOrder = (orderId) => {
   expandedOrder.value = expandedOrder.value === orderId ? null : orderId
@@ -145,21 +183,85 @@ const updateStatus = async (id, newStatus) => {
 
 <style scoped>
 .orders-page {
-  padding: 16px;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
 }
 
-@media (min-width: 768px) {
-  .orders-page {
-    padding: 32px;
-  }
+.page-header {
+  margin-bottom: 24px;
 }
 
 .page-title {
   font-size: 2rem;
   font-weight: 800;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 2px solid #E5E7EB;
+  border-radius: 10px;
+  background: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  border-color: #9CA3AF;
+}
+
+.filter-btn.active {
+  background: #111;
+  border-color: #111;
+  color: white;
+}
+
+.filter-btn.active.pending {
+  background: #F59E0B;
+  border-color: #F59E0B;
+}
+
+.filter-btn.active.processing {
+  background: #3B82F6;
+  border-color: #3B82F6;
+}
+
+.filter-btn.active.shipping {
+  background: #6366F1;
+  border-color: #6366F1;
+}
+
+.filter-btn.active.delivered {
+  background: #10B981;
+  border-color: #10B981;
+}
+
+.filter-btn.active.cancelled {
+  background: #EF4444;
+  border-color: #EF4444;
+}
+
+.filter-count {
+  background: rgba(255,255,255,0.3);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+}
+
+.filter-btn:not(.active) .filter-count {
+  background: #F3F4F6;
+  color: #6B7280;
 }
 
 .empty-state {
@@ -415,7 +517,20 @@ const updateStatus = async (id, newStatus) => {
 @media (max-width: 768px) {
   .page-title {
     font-size: 1.5rem;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .filters {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .filter-btn {
+    padding: 8px 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   
   .order-card {

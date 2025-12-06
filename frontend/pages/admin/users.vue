@@ -25,7 +25,7 @@
         <div class="user-info">
           <div class="user-name">
             {{ user.first_name || 'No name' }} {{ user.last_name || '' }}
-            <span class="role-badge" :class="user.role">{{ user.role }}</span>
+              <span class="role-badge" :class="user.role">{{ user.role }}</span>
           </div>
           <div class="user-phone">{{ user.phone }}</div>
         </div>
@@ -114,9 +114,7 @@ const demoteUser = async (userId) => {
 
 <style scoped>
 .users-page {
-  padding: 32px;
-  max-width: 1000px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .page-title {
@@ -329,10 +327,6 @@ const demoteUser = async (userId) => {
 }
 
 @media (max-width: 768px) {
-  .users-page {
-    padding: 16px;
-  }
-  
   .users-stats {
     grid-template-columns: 1fr;
   }

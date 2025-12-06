@@ -4,15 +4,15 @@
     
     <main class="container py-8">
       <!-- Hero Section -->
-      <div class="hero-card mb-8">
+      <div v-if="banner" class="hero-card mb-8">
         <div class="hero-content">
-          <div class="badge">NEW ARRIVAL</div>
-          <h1 class="hero-title">Ray-Ban Meta<br/>Smart Glasses</h1>
-          <p class="hero-price">Starting from $299</p>
-          <NuxtLink to="/products" class="hero-btn">Shop Now</NuxtLink>
+          <div class="badge">{{ banner.badge_text }}</div>
+          <h1 class="hero-title" v-html="banner.title.replace(/\\n/g, '<br/>')"></h1>
+          <p class="hero-price">{{ banner.subtitle }}</p>
+          <NuxtLink :to="banner.button_link" class="hero-btn">{{ banner.button_text }}</NuxtLink>
         </div>
         <div class="hero-image">
-          <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop" alt="Smart Glasses" />
+          <img :src="banner.image_url" alt="Banner" />
         </div>
       </div>
 
@@ -79,6 +79,7 @@
 </template>
 
 <script setup>
+const { data: banner } = await useFetch('http://localhost:8000/banner', { server: false })
 const { data: brands } = await useFetch('http://localhost:8000/brands', { server: false })
 const { data: products, pending } = await useFetch('http://localhost:8000/products', {
   server: false

@@ -181,6 +181,25 @@ class DashboardStats(SQLModel):
 class OrderStatusUpdate(SQLModel):
     status: str
 
+class Banner(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    badge_text: str = "NEW ARRIVAL"
+    title: str = "Ray-Ban Meta Smart Glasses"
+    subtitle: str = "Starting from $299"
+    button_text: str = "Shop Now"
+    button_link: str = "/products"
+    image_url: str = "https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop"
+    is_active: bool = True
+
+class BannerUpdate(SQLModel):
+    badge_text: Optional[str] = None
+    title: Optional[str] = None
+    subtitle: Optional[str] = None
+    button_text: Optional[str] = None
+    button_link: Optional[str] = None
+    image_url: Optional[str] = None
+    is_active: Optional[bool] = None
+
 # --- Database ---
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
@@ -427,6 +446,20 @@ def on_startup():
         if not admin:
             admin_user = User(phone="admin", password_hash=get_password_hash("admin123"), role="admin")
             session.add(admin_user)
+            session.commit()
+        
+        # Seed Banner
+        if not session.exec(select(Banner)).first():
+            default_banner = Banner(
+                badge_text="NEW ARRIVAL",
+                title="Ray-Ban Meta Smart Glasses",
+                subtitle="Starting from $299",
+                button_text="Shop Now",
+                button_link="/products",
+                image_url="https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop",
+                is_active=True
+            )
+            session.add(default_banner)
             session.commit()
 
 # --- Endpoints ---
@@ -795,3 +828,75 @@ def update_order_status(order_id: int, status_update: OrderStatusUpdate, current
         session.commit()
         session.refresh(order)
         return order
+
+# --- Banner Endpoints ---
+
+@app.get("/banner", response_model=Banner)
+def get_banner():
+    with Session(engine) as session:
+        banner = session.exec(select(Banner).where(Banner.is_active == True)).first()
+        if not banner:
+            # Return default banner if none exists
+            return Banner(
+                id=0,
+                badge_text="NEW ARRIVAL",
+                title="Ray-Ban Meta Smart Glasses",
+                subtitle="Starting from $299",
+                button_text="Shop Now",
+                button_link="/products",
+                image_url="https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop",
+                is_active=True
+            )
+        return banner
+
+@app.get("/admin/banner", response_model=Banner)
+def get_admin_banner(current_user: User = Depends(get_current_admin)):
+    with Session(engine) as session:
+        banner = session.exec(select(Banner)).first()
+        if not banner:
+            # Create default banner
+            banner = Banner(
+                badge_text="NEW ARRIVAL",
+                title="Ray-Ban Meta Smart Glasses",
+                subtitle="Starting from $299",
+                button_text="Shop Now",
+                button_link="/products",
+                image_url="https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop",
+                is_active=True
+            )
+            session.add(banner)
+            session.commit()
+            session.refresh(banner)
+        return banner
+
+@app.put("/admin/banner", response_model=Banner)
+def update_banner(banner_update: BannerUpdate, current_user: User = Depends(get_current_admin)):
+    with Session(engine) as session:
+        banner = session.exec(select(Banner)).first()
+        if not banner:
+            # Create new banner
+            banner = Banner()
+            session.add(banner)
+            session.commit()
+            session.refresh(banner)
+        
+        # Update fields
+        if banner_update.badge_text is not None:
+            banner.badge_text = banner_update.badge_text
+        if banner_update.title is not None:
+            banner.title = banner_update.title
+        if banner_update.subtitle is not None:
+            banner.subtitle = banner_update.subtitle
+        if banner_update.button_text is not None:
+            banner.button_text = banner_update.button_text
+        if banner_update.button_link is not None:
+            banner.button_link = banner_update.button_link
+        if banner_update.image_url is not None:
+            banner.image_url = banner_update.image_url
+        if banner_update.is_active is not None:
+            banner.is_active = banner_update.is_active
+        
+        session.add(banner)
+        session.commit()
+        session.refresh(banner)
+        return banner

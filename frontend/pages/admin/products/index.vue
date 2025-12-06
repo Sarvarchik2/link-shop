@@ -80,9 +80,7 @@ const deleteProduct = async (id) => {
 
 <style scoped>
 .products-page {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .page-header {
@@ -358,10 +356,6 @@ const deleteProduct = async (id) => {
 }
 
 @media (min-width: 1024px) {
-  .products-page {
-    padding: 32px;
-  }
-  
   .products-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 24px;

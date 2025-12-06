@@ -96,8 +96,8 @@
                 <span class="upload-text">Click or drag images to upload</span>
                 <span class="upload-hint">PNG, JPG up to 5MB</span>
               </div>
-            </div>
-            
+          </div>
+
             <!-- OR URL Input -->
             <div class="url-input-section">
               <span class="divider-text">or add by URL</span>
@@ -120,13 +120,13 @@
               <input v-model.number="size.stock" type="number" min="0" class="input stock-input" placeholder="Stock" />
               <button type="button" @click="removeSize(index)" class="btn-remove">✕</button>
             </div>
-          </div>
-          
+            </div>
+            
           <button type="button" @click="addSize" class="btn-add">
             + Add Size
           </button>
           <p class="help-text">Add available sizes with their stock quantities</p>
-        </div>
+              </div>
 
         <div class="form-section">
           <h2 class="section-title">Colors</h2>
@@ -309,9 +309,7 @@ const handleSubmit = async () => {
 
 <style scoped>
 .add-product-page {
-  padding: 32px;
-  max-width: 900px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .page-header {
