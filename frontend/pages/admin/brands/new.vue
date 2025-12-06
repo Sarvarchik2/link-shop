@@ -50,9 +50,10 @@ const handleSubmit = async () => {
       headers: { Authorization: `Bearer ${token.value}` },
       body: form
     })
+    useToast().success('Brand created successfully!')
     navigateTo('/admin/brands')
   } catch (e) {
-    alert('Failed to create brand')
+    useToast().error('Failed to create brand')
   } finally {
     loading.value = false
   }

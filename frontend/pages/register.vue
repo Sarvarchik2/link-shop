@@ -78,7 +78,11 @@ const password = ref('')
 const { register } = useAuth()
 
 const handleRegister = async () => {
-  await register(phone.value, password.value, firstName.value, lastName.value)
+  try {
+    await register(phone.value, password.value, firstName.value, lastName.value)
+  } catch (e) {
+    useToast().error('Registration failed. Phone number might already be registered.')
+  }
 }
 </script>
 

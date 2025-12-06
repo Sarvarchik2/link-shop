@@ -24,23 +24,22 @@ definePageMeta({
 
 const username = ref('')
 const password = ref('')
-const { login, user } = useAuth()
+const { login, user, token } = useAuth()
 
 const handleLogin = async () => {
   try {
-    await login(username.value, password.value)
-    // Wait a bit for user to be fetched
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await login(username.value, password.value, false)
     
     if (user.value && user.value.role === 'admin') {
       navigateTo('/admin')
     } else {
-      alert('Access denied. Admin privileges required.')
-      navigateTo('/login')
+      useToast().error('Access denied. Admin privileges required.')
+      token.value = null
+      user.value = null
     }
   } catch (e) {
     console.error(e)
-    alert('Login failed')
+    useToast().error('Invalid username or password')
   }
 }
 </script>

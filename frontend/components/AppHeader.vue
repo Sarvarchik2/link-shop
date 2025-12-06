@@ -12,7 +12,7 @@
           <span>EYEWEAR</span>
         </NuxtLink>
 
-        <!-- Navigation -->
+        <!-- Navigation (Desktop only) -->
         <nav class="nav-links">
           <NuxtLink to="/" class="nav-link">Home</NuxtLink>
           <NuxtLink to="/products" class="nav-link">Products</NuxtLink>
@@ -22,28 +22,23 @@
 
         <!-- Actions -->
         <div class="header-actions">
-          <button class="icon-btn">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </button>
-          
-          <NuxtLink to="/favorites" class="icon-btn">
+          <!-- Desktop only icons -->
+          <NuxtLink to="/favorites" class="icon-btn desktop-only">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
           </NuxtLink>
           
-          <NuxtLink to="/cart" class="icon-btn cart-btn">
+          <NuxtLink to="/cart" class="icon-btn desktop-only cart-btn">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="9" cy="21" r="1"></circle>
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
-            <span v-if="cart.totalItems > 0" class="cart-badge">{{ cart.totalItems }}</span>
+            <span v-if="totalItems > 0" class="cart-badge">{{ totalItems }}</span>
           </NuxtLink>
           
+          <!-- Profile - visible on all screens -->
           <NuxtLink to="/profile" class="icon-btn profile-btn">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -73,11 +68,24 @@
       <span>Products</span>
     </NuxtLink>
     
+    <NuxtLink to="/cart" class="mobile-nav-item cart-nav-item">
+      <div class="cart-icon-wrapper">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span v-if="totalItems > 0" class="cart-badge-mobile">{{ totalItems }}</span>
+      </div>
+      <span>Cart</span>
+    </NuxtLink>
+    
     <NuxtLink to="/orders" class="mobile-nav-item">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="9" cy="21" r="1"></circle>
-        <circle cx="20" cy="21" r="1"></circle>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
       </svg>
       <span>Orders</span>
     </NuxtLink>
@@ -88,19 +96,11 @@
       </svg>
       <span>Favorites</span>
     </NuxtLink>
-    
-    <NuxtLink to="/profile" class="mobile-nav-item">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
-      </svg>
-      <span>Profile</span>
-    </NuxtLink>
   </nav>
 </template>
 
 <script setup>
-const cart = useCart()
+const { totalItems } = useCart()
 </script>
 
 <style scoped>
@@ -163,7 +163,7 @@ const cart = useCart()
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .icon-btn {
@@ -204,6 +204,11 @@ const cart = useCart()
   border: 2px solid white;
 }
 
+/* Hide on mobile */
+.desktop-only {
+  display: none;
+}
+
 /* Mobile Navigation */
 .mobile-nav {
   display: flex;
@@ -214,6 +219,7 @@ const cart = useCart()
   background: white;
   border-top: 1px solid #f0f0f0;
   padding: 8px 0;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
   z-index: 100;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
 }
@@ -226,7 +232,7 @@ const cart = useCart()
   gap: 4px;
   padding: 8px;
   color: #999;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
   transition: all 0.2s;
 }
@@ -236,7 +242,28 @@ const cart = useCart()
 }
 
 .mobile-nav-item svg {
-  stroke-width: 2.5;
+  stroke-width: 2;
+}
+
+.cart-icon-wrapper {
+  position: relative;
+}
+
+.cart-badge-mobile {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: #EF4444;
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
 }
 
 /* Desktop Breakpoint */
@@ -249,28 +276,42 @@ const cart = useCart()
     display: none;
   }
   
+  .desktop-only {
+    display: flex;
+  }
+  
   .nav-link::after {
     bottom: -28px;
   }
 }
 
-/* Hide on mobile */
+/* Mobile styles */
 @media (max-width: 767px) {
   .desktop-header .nav-links {
     display: none;
   }
   
   .header-content {
-    height: 64px;
+    height: 60px;
   }
   
   .logo span {
     font-size: 1.1rem;
   }
   
+  .logo svg {
+    width: 28px;
+    height: 28px;
+  }
+  
   .icon-btn {
     width: 40px;
     height: 40px;
+    border-radius: 10px;
+  }
+  
+  .header-actions {
+    gap: 8px;
   }
 }
 </style>

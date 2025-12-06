@@ -1,25 +1,38 @@
 export const useCart = () => {
     const items = useState<any[]>('cart_items', () => [])
 
+    // Create unique key for cart item based on product, color, and size
+    const getItemKey = (product: any) => {
+        const colorKey = product.selectedColor?.name || 'no-color'
+        const sizeKey = product.selectedSize || 'no-size'
+        return `${product.id}-${colorKey}-${sizeKey}`
+    }
+
     const addItem = (product: any) => {
-        const existing = items.value.find(i => i.id === product.id)
+        const itemKey = getItemKey(product)
+        const existing = items.value.find(i => getItemKey(i) === itemKey)
+        
         if (existing) {
             existing.quantity++
         } else {
-            items.value.push({ ...product, quantity: 1 })
+            items.value.push({ 
+                ...product, 
+                quantity: 1,
+                cartKey: itemKey
+            })
         }
     }
 
-    const removeItem = (productId: number) => {
-        items.value = items.value.filter(i => i.id !== productId)
+    const removeItem = (cartKey: string) => {
+        items.value = items.value.filter(i => i.cartKey !== cartKey)
     }
 
-    const updateQuantity = (productId: number, delta: number) => {
-        const item = items.value.find(i => i.id === productId)
+    const updateQuantity = (cartKey: string, delta: number) => {
+        const item = items.value.find(i => i.cartKey === cartKey)
         if (item) {
             item.quantity += delta
             if (item.quantity <= 0) {
-                removeItem(productId)
+                removeItem(cartKey)
             }
         }
     }

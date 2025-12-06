@@ -51,7 +51,7 @@ const deleteCategory = async (id) => {
     })
     refresh()
   } catch (e) {
-    alert('Failed to delete category')
+    useToast().error('Failed to delete category')
   }
 }
 </script>

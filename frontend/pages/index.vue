@@ -9,7 +9,7 @@
           <div class="badge">NEW ARRIVAL</div>
           <h1 class="hero-title">Ray-Ban Meta<br/>Smart Glasses</h1>
           <p class="hero-price">Starting from $299</p>
-          <button class="hero-btn">Shop Now</button>
+          <NuxtLink to="/products" class="hero-btn">Shop Now</NuxtLink>
         </div>
         <div class="hero-image">
           <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop" alt="Smart Glasses" />
@@ -18,49 +18,60 @@
 
       <!-- Brand Filters -->
       <section class="mb-8">
-        <div class="flex justify-between items-center mb-6">
+        <div class="section-header">
           <h2 class="section-title">Shop by Brand</h2>
-          <button class="text-sm font-semibold text-gray-500 hover:text-black">View All →</button>
+          <NuxtLink to="/products" class="view-all-btn">
+            View All
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </NuxtLink>
         </div>
         <div class="brand-grid">
-          <button 
+          <NuxtLink 
             v-for="brand in brands" 
             :key="brand.id"
+            :to="`/products?brand=${brand.name}`"
             class="brand-card"
-            :class="{ active: selectedBrand === brand.name }"
-            @click="selectedBrand = selectedBrand === brand.name ? null : brand.name"
           >
             <div class="brand-logo-wrapper">
               <img :src="brand.logo_url" :alt="brand.name" class="brand-logo-img" />
             </div>
             <span class="brand-name-text">{{ brand.name }}</span>
-          </button>
+          </NuxtLink>
         </div>
       </section>
 
-      <!-- Products Grid -->
+      <!-- Featured Products -->
       <section class="mb-8">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="section-title">
-            {{ selectedBrand ? `${selectedBrand} Collection` : 'Featured Products' }}
-          </h2>
-          <div class="flex gap-2">
-            <button class="filter-btn">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
-              Filters
-            </button>
-            <button class="filter-btn">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-              Sort
-            </button>
-          </div>
+        <div class="section-header">
+          <h2 class="section-title">Featured Products</h2>
+          <NuxtLink to="/products" class="view-all-btn">
+            View All
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </NuxtLink>
         </div>
         <div v-if="pending" class="text-center py-12 text-gray-400">
           <div class="loading-spinner"></div>
           <p class="mt-4">Loading products...</p>
         </div>
         <div v-else class="products-grid">
-          <ProductCard v-for="product in filteredProducts" :key="product.id" :product="product" />
+          <ProductCard v-for="product in featuredProducts" :key="product.id" :product="product" />
+        </div>
+        
+        <!-- View All Products Button -->
+        <div class="view-all-section">
+          <NuxtLink to="/products" class="view-all-products-btn">
+            <span>Browse All Products</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </NuxtLink>
         </div>
       </section>
     </main>
@@ -68,16 +79,15 @@
 </template>
 
 <script setup>
-const selectedBrand = ref(null)
 const { data: brands } = await useFetch('http://localhost:8000/brands', { server: false })
 const { data: products, pending } = await useFetch('http://localhost:8000/products', {
   server: false
 })
 
-const filteredProducts = computed(() => {
+// Show only 4 featured products
+const featuredProducts = computed(() => {
   if (!products.value) return []
-  if (!selectedBrand.value) return products.value
-  return products.value.filter(p => p.brand === selectedBrand.value)
+  return products.value.slice(0, 4)
 })
 </script>
 
@@ -85,6 +95,7 @@ const filteredProducts = computed(() => {
 .home-page {
   min-height: 100vh;
   background: #FAFAFA;
+  padding-bottom: 100px;
 }
 
 .hero-card {
@@ -135,6 +146,7 @@ const filteredProducts = computed(() => {
 }
 
 .hero-btn {
+  display: inline-block;
   background: white;
   color: #111;
   padding: 16px 40px;
@@ -145,6 +157,7 @@ const filteredProducts = computed(() => {
   font-size: 1rem;
   transition: all 0.3s;
   box-shadow: 0 4px 20px rgba(255,255,255,0.2);
+  text-decoration: none;
 }
 
 .hero-btn:hover {
@@ -168,6 +181,13 @@ const filteredProducts = computed(() => {
   object-fit: contain;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
 .section-title {
   font-size: 1.75rem;
   font-weight: 800;
@@ -175,9 +195,31 @@ const filteredProducts = computed(() => {
   letter-spacing: -0.5px;
 }
 
+.view-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: white;
+  border: 2px solid #E5E7EB;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.view-all-btn:hover {
+  background: #111;
+  border-color: #111;
+  color: white;
+  transform: translateX(4px);
+}
+
 .brand-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 16px;
 }
 
@@ -192,18 +234,14 @@ const filteredProducts = computed(() => {
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
+  color: #111;
 }
 
 .brand-card:hover {
   border-color: #111;
   transform: translateY(-4px);
   box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-}
-
-.brand-card.active {
-  background: #111;
-  border-color: #111;
-  color: white;
 }
 
 .brand-logo-wrapper {
@@ -217,10 +255,6 @@ const filteredProducts = computed(() => {
   padding: 16px;
 }
 
-.brand-card.active .brand-logo-wrapper {
-  background: white;
-}
-
 .brand-logo-img {
   width: 100%;
   height: 100%;
@@ -232,30 +266,36 @@ const filteredProducts = computed(() => {
   font-size: 0.95rem;
 }
 
-.filter-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 12px;
-  border: 1px solid #e0e0e0;
-  background: white;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.filter-btn:hover {
-  border-color: #111;
-  background: #111;
-  color: white;
-}
-
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.view-all-section {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.view-all-products-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 40px;
+  background: #111;
+  color: white;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.view-all-products-btn:hover {
+  background: #000;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
 }
 
 .loading-spinner {
@@ -276,11 +316,22 @@ const filteredProducts = computed(() => {
 @media (max-width: 768px) {
   .hero-card {
     padding: 32px 24px;
-    min-height: 300px;
+    min-height: 280px;
+    border-radius: 24px;
   }
   
   .hero-title {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+  
+  .hero-price {
+    font-size: 1rem;
+    margin-bottom: 24px;
+  }
+  
+  .hero-btn {
+    padding: 14px 28px;
+    font-size: 0.875rem;
   }
   
   .hero-image {
@@ -290,25 +341,56 @@ const filteredProducts = computed(() => {
   
   .brand-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .brand-card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  
+  .brand-logo-wrapper {
+    width: 60px;
+    height: 60px;
+    padding: 12px;
+  }
+  
+  .brand-name-text {
+    font-size: 0.8rem;
   }
   
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 12px;
   }
   
   .section-title {
     font-size: 1.25rem;
   }
+  
+  .section-header {
+    margin-bottom: 16px;
+  }
+  
+  .view-all-btn {
+    padding: 8px 14px;
+    font-size: 0.75rem;
+  }
+  
+  .view-all-products-btn {
+    padding: 16px 32px;
+    font-size: 0.875rem;
+  }
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
   .hero-image {
     opacity: 0.5;
   }
   
   .products-grid {
     grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
   }
 }
 </style>

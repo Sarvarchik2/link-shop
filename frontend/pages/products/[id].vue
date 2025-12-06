@@ -37,17 +37,40 @@
             <div v-else class="stock-badge in-stock">In Stock ({{ product.stock }})</div>
           </div>
 
+          <div v-if="productColors.length > 0" class="color-selector">
+            <h3 class="section-title">Select Color</h3>
+            <div class="colors">
+              <button 
+                v-for="color in productColors" 
+                :key="color.name" 
+                class="color-btn"
+                :class="{ active: selectedColor?.name === color.name, 'out-of-stock': color.stock === 0 }"
+                :style="{ '--color': color.hex }"
+                @click="selectColor(color)"
+                :disabled="color.stock === 0"
+                :title="color.stock === 0 ? 'Out of stock' : `${color.name} (${color.stock} available)`"
+              >
+                <span class="color-swatch"></span>
+                <span class="color-name">{{ color.name }}</span>
+                <span v-if="color.stock === 0" class="color-oos">✕</span>
+              </button>
+            </div>
+          </div>
+
           <div v-if="productSizes.length > 0" class="size-selector">
             <h3 class="section-title">Select Size</h3>
             <div class="sizes">
               <button 
                 v-for="size in productSizes" 
-                :key="size" 
+                :key="size.name || size" 
                 class="size-btn"
-                :class="{ active: selectedSize === size }"
-                @click="selectedSize = size"
+                :class="{ active: selectedSize === (size.name || size), 'out-of-stock': size.stock === 0 }"
+                @click="selectSize(size)"
+                :disabled="size.stock === 0"
+                :title="size.stock === 0 ? 'Out of stock' : `${size.name || size} (${size.stock || 'available'})`"
               >
-                {{ size }}
+                {{ size.name || size }}
+                <span v-if="size.stock === 0" class="size-oos">✕</span>
               </button>
             </div>
           </div>
@@ -72,14 +95,14 @@
             <button 
               @click="addToCart" 
               class="btn-add-cart"
-              :disabled="product.stock === 0"
+              :disabled="!canAddToCart"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="9" cy="21" r="1"></circle>
                 <circle cx="20" cy="21" r="1"></circle>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
               </svg>
-              {{ product.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
+              {{ product.stock === 0 ? 'Out of Stock' : 'ADD TO CART' }}
             </button>
             <button @click="toggleFavorite" class="btn-favorite" :class="{ active: product.is_favorite }">
               <svg width="20" height="20" viewBox="0 0 24 24" :fill="product.is_favorite ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
@@ -95,7 +118,7 @@
 
 <script setup>
 const route = useRoute()
-const cart = useCart()
+const { addItem } = useCart()
 const { user } = useAuth()
 
 const { data: product, pending, refresh } = await useFetch(`http://localhost:8000/products/${route.params.id}`, {
@@ -104,6 +127,7 @@ const { data: product, pending, refresh } = await useFetch(`http://localhost:800
 
 const selectedImage = ref(null)
 const selectedSize = ref(null)
+const selectedColor = ref(null)
 
 const productImages = computed(() => {
   if (!product.value) return []
@@ -124,17 +148,67 @@ const productSizes = computed(() => {
   }
 })
 
-const addToCart = () => {
-  if (product.value && product.value.stock > 0) {
-    cart.addItem(product.value)
-    alert('Added to cart!')
+const productColors = computed(() => {
+  if (!product.value) return []
+  try {
+    return product.value.colors ? JSON.parse(product.value.colors) : []
+  } catch {
+    return []
+  }
+})
+
+const selectColor = (color) => {
+  if (color.stock > 0) {
+    selectedColor.value = color
   }
 }
 
+const selectSize = (size) => {
+  // Handle both object format { name, stock } and string format
+  if (typeof size === 'object') {
+    if (size.stock > 0) {
+      selectedSize.value = size.name
+    }
+  } else {
+    selectedSize.value = size
+  }
+}
+
+const canAddToCart = computed(() => {
+  if (!product.value || product.value.stock === 0) return false
+  // If product has colors, a color must be selected
+  if (productColors.value.length > 0 && !selectedColor.value) return false
+  // If product has sizes, a size must be selected
+  if (productSizes.value.length > 0 && !selectedSize.value) return false
+  return true
+})
+
+const toast = useToast()
+
+const addToCart = () => {
+  if (!canAddToCart.value) {
+    if (productColors.value.length > 0 && !selectedColor.value) {
+      toast.warning('Please select a color')
+      return
+    }
+    if (productSizes.value.length > 0 && !selectedSize.value) {
+      toast.warning('Please select a size')
+      return
+    }
+    return
+  }
+  
+  addItem({
+    ...product.value,
+    selectedColor: selectedColor.value,
+    selectedSize: selectedSize.value
+  })
+  toast.success('Added to cart!')
+}
+
 const toggleFavorite = async () => {
-  // Check if user is logged in
   if (!user.value) {
-    alert('Please login to add items to favorites')
+    toast.warning('Please login to add items to favorites')
     navigateTo('/login')
     return
   }
@@ -274,6 +348,66 @@ const toggleFavorite = async () => {
   color: #991B1B;
 }
 
+.color-selector {
+  padding: 24px 0;
+  border-top: 1px solid #E5E7EB;
+}
+
+.colors {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.color-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 2px solid #E5E7EB;
+  border-radius: 50px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.color-btn:hover:not(:disabled) {
+  border-color: #111;
+}
+
+.color-btn.active {
+  border-color: #111;
+  background: #F9FAFB;
+}
+
+.color-btn.out-of-stock {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color);
+  border: 2px solid rgba(0,0,0,0.1);
+}
+
+.color-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.color-oos {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  color: #EF4444;
+}
+
 .size-selector {
   padding: 24px 0;
   border-top: 1px solid #E5E7EB;
@@ -302,9 +436,14 @@ const toggleFavorite = async () => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
-.size-btn:hover {
+.size-btn:hover:not(:disabled) {
   border-color: #111;
 }
 
@@ -312,6 +451,18 @@ const toggleFavorite = async () => {
   background: #111;
   color: white;
   border-color: #111;
+}
+
+.size-btn.out-of-stock {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #F3F4F6;
+  text-decoration: line-through;
+}
+
+.size-oos {
+  color: #EF4444;
+  font-size: 0.75rem;
 }
 
 .product-description {

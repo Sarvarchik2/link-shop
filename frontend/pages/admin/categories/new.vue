@@ -50,9 +50,10 @@ const handleSubmit = async () => {
       headers: { Authorization: `Bearer ${token.value}` },
       body: form
     })
+    useToast().success('Category created successfully!')
     navigateTo('/admin/categories')
   } catch (e) {
-    alert('Failed to create category')
+    useToast().error('Failed to create category')
   } finally {
     loading.value = false
   }

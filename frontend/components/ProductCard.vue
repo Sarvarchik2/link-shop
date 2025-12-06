@@ -32,7 +32,7 @@ const { user } = useAuth()
 const toggleFav = async () => {
   // Check if user is logged in
   if (!user.value) {
-    alert('Please login to add items to favorites')
+    useToast().warning('Please login to add items to favorites')
     navigateTo('/login')
     return
   }
@@ -118,10 +118,10 @@ const toggleFav = async () => {
   transform: translate(-50%, -50%);
   background: rgba(239, 68, 68, 0.95);
   color: white;
-  padding: 12px 32px;
+  padding: 12px 17px;
   border-radius: 8px;
-  font-weight: 800;
-  font-size: 1.125rem;
+  font-weight: 700;
+  font-size: 18px;
   letter-spacing: 1px;
   z-index: 3;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);

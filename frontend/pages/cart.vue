@@ -1,19 +1,21 @@
 <template>
   <div class="cart-page">
-    <AppHeader />
+    <!-- Desktop Header -->
+    <AppHeader class="desktop-header" />
     
-    <main class="container py-8">
-      <div class="flex items-center gap-4 mb-8">
-        <button @click="$router.back()" class="back-btn">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-        </button>
-        <h1 class="page-title mb-0">Shopping Cart</h1>
-      </div>
+    <!-- Mobile Header -->
+    <header class="cart-header mobile-header">
+      <button @click="$router.back()" class="back-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <h1 class="cart-title">Cart</h1>
+      <div class="header-spacer"></div>
+    </header>
 
-      <div v-if="cart.items.length === 0" class="empty-cart">
+    <main class="cart-content">
+      <div v-if="items.length === 0" class="empty-cart">
         <div class="empty-icon">
           <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="9" cy="21" r="1"></circle>
@@ -23,119 +25,244 @@
         </div>
         <h2 class="empty-title">Your cart is empty</h2>
         <p class="empty-text">Add some products to get started</p>
-        <NuxtLink to="/" class="btn-shop">Continue Shopping</NuxtLink>
+        <NuxtLink to="/products" class="btn-shop">Continue Shopping</NuxtLink>
       </div>
 
-      <div v-else class="cart-content">
-        <div class="cart-items">
-          <div v-for="item in cart.items" :key="item.id" class="cart-item">
+      <div v-else class="cart-items">
+        <div 
+          v-for="item in items" 
+          :key="item.cartKey" 
+          class="cart-item"
+          :class="{ swiped: swipedItem === item.cartKey }"
+        >
+          <div 
+            class="item-content" 
+            @touchstart="handleTouchStart($event, item.cartKey)"
+            @touchmove="handleTouchMove($event, item.cartKey)"
+            @touchend="handleTouchEnd"
+            :style="getSwipeStyle(item.cartKey)"
+          >
             <div class="item-image">
               <img :src="item.image_url" :alt="item.name" />
             </div>
-            <div class="item-details">
+            <div class="item-info">
               <h3 class="item-name">{{ item.name }}</h3>
-              <p class="item-category">{{ item.category }}</p>
-              <p class="item-price">${{ item.price.toFixed(2) }}</p>
+              <p class="item-meta">
+                {{ item.brand }}
+                <span v-if="item.selectedColor"> · {{ item.selectedColor.name }}</span>
+                <span v-if="item.selectedSize"> · {{ item.selectedSize }}</span>
+              </p>
+              <p class="item-price">${{ item.price?.toFixed(2) }}</p>
             </div>
-            <div class="item-actions">
-              <div class="quantity-control">
-                <button @click="cart.updateQuantity(item.id, item.quantity - 1)" class="qty-btn">-</button>
+            <div class="item-controls">
+              <div class="item-quantity">
+                <button class="qty-btn" @click="updateQuantity(item.cartKey, -1)">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                  </svg>
+                </button>
                 <span class="qty-value">{{ item.quantity }}</span>
-                <button @click="cart.updateQuantity(item.id, item.quantity + 1)" class="qty-btn">+</button>
+                <button class="qty-btn" @click="updateQuantity(item.cartKey, 1)">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="16"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                  </svg>
+                </button>
               </div>
-              <button @click="cart.removeItem(item.id)" class="btn-remove">Remove</button>
+              <!-- Desktop delete button -->
+              <button class="delete-btn-desktop" @click="removeItem(item.cartKey)" title="Remove item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
             </div>
           </div>
-        </div>
-
-        <div class="cart-summary">
-          <h2 class="summary-title">Order Summary</h2>
-          <div class="summary-row">
-            <span>Subtotal</span>
-            <span>${{ cart.totalPrice.toFixed(2) }}</span>
-          </div>
-          <div class="summary-row">
-            <span>Shipping</span>
-            <span>Free</span>
-          </div>
-          <div class="summary-divider"></div>
-          <div class="summary-total">
-            <span>Total</span>
-            <span>${{ cart.totalPrice.toFixed(2) }}</span>
-          </div>
-          <button @click="handleCheckout" class="btn-checkout">Proceed to Checkout</button>
+          <!-- Mobile swipe delete button -->
+          <button class="delete-btn-mobile" @click="removeItem(item.cartKey)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
         </div>
       </div>
     </main>
+
+    <footer v-if="items.length > 0" class="cart-footer">
+      <div class="total-section">
+        <span class="total-label">Grand Total</span>
+        <span class="total-price">${{ totalPrice.toFixed(2) }}</span>
+      </div>
+      <button @click="handleCheckout" class="btn-checkout">CHECK OUT</button>
+    </footer>
   </div>
 </template>
 
 <script setup>
-const cart = useCart()
+const { items, removeItem, updateQuantity, totalPrice, clearCart } = useCart()
 const { token } = useAuth()
 
-const handleCheckout = async () => {
+const swipedItem = ref(null)
+const swipeOffset = ref({})
+let touchStartX = 0
+let currentTouchX = 0
+let isSwiping = false
+
+const handleTouchStart = (e, cartKey) => {
+  touchStartX = e.touches[0].clientX
+  currentTouchX = touchStartX
+  isSwiping = true
+  
+  // If another item is swiped, close it
+  if (swipedItem.value && swipedItem.value !== cartKey) {
+    swipedItem.value = null
+    swipeOffset.value = {}
+  }
+}
+
+const handleTouchMove = (e, cartKey) => {
+  if (!isSwiping) return
+  
+  currentTouchX = e.touches[0].clientX
+  const diff = touchStartX - currentTouchX
+  
+  // Only allow left swipe (positive diff)
+  if (diff > 0) {
+    // Limit the swipe distance
+    const offset = Math.min(diff, 80)
+    swipeOffset.value = { [cartKey]: offset }
+  } else if (diff < -20 && swipedItem.value === cartKey) {
+    // Closing swipe
+    swipeOffset.value = { [cartKey]: Math.max(80 + diff, 0) }
+  }
+}
+
+const handleTouchEnd = () => {
+  if (!isSwiping) return
+  isSwiping = false
+  
+  const diff = touchStartX - currentTouchX
+  const currentKey = Object.keys(swipeOffset.value)[0]
+  
+  if (diff > 40) {
+    // Snap to open
+    swipedItem.value = currentKey
+    swipeOffset.value = { [currentKey]: 80 }
+  } else if (diff < -20) {
+    // Snap to close
+    swipedItem.value = null
+    swipeOffset.value = {}
+  } else {
+    // Return to previous state
+    if (swipedItem.value === currentKey) {
+      swipeOffset.value = { [currentKey]: 80 }
+    } else {
+      swipeOffset.value = {}
+    }
+  }
+}
+
+const getSwipeStyle = (cartKey) => {
+  const offset = swipeOffset.value[cartKey] || 0
+  return {
+    transform: `translateX(-${offset}px)`,
+    transition: isSwiping ? 'none' : 'transform 0.3s ease'
+  }
+}
+
+const toast = useToast()
+
+const handleCheckout = () => {
   if (!token.value) {
-    alert('Please login to checkout')
+    toast.warning('Please login to checkout')
     navigateTo('/login')
     return
   }
-
-  try {
-    const items = cart.items.map(item => ({
-      product_id: item.id,
-      quantity: item.quantity
-    }))
-
-    await $fetch('http://localhost:8000/orders', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token.value}` },
-      body: { items }
-    })
-
-    cart.clearCart()
-    alert('Order placed successfully!')
-    navigateTo('/orders')
-  } catch (e) {
-    console.error(e)
-    alert('Failed to place order')
+  
+  if (items.value.length === 0) {
+    toast.warning('Your cart is empty')
+    return
   }
+  
+  navigateTo('/checkout')
 }
 </script>
 
 <style scoped>
 .cart-page {
   min-height: 100vh;
-  background: #FAFAFA;
-  padding-bottom: 100px;
+  background: #F5F5F5;
+  display: flex;
+  flex-direction: column;
 }
 
-.page-title {
-  font-size: 2rem;
-  font-weight: 800;
+/* Desktop header hidden on mobile */
+.desktop-header {
+  display: none;
+}
+
+/* Mobile header */
+.mobile-header {
+  display: flex;
+}
+
+.cart-header {
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .back-btn {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
-  background: white;
-  border: 1px solid #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: all 0.2s;
+  color: #111;
+  border-radius: 12px;
+  transition: background 0.2s;
 }
 
 .back-btn:hover {
-  background: #111;
-  color: white;
+  background: #f5f5f5;
+}
+
+.cart-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+.cart-content {
+  flex: 1;
+  padding: 16px;
+  padding-bottom: 140px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .empty-cart {
   text-align: center;
-  padding: 80px 20px;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 20px;
+  margin-top: 20px;
 }
 
 .empty-icon {
@@ -144,15 +271,15 @@ const handleCheckout = async () => {
 }
 
 .empty-title {
-  font-size: 1.75rem;
-  font-weight: 800;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: #111;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .empty-text {
-  color: #6B7280;
-  margin-bottom: 32px;
+  color: #9CA3AF;
+  margin-bottom: 24px;
 }
 
 .btn-shop {
@@ -160,7 +287,7 @@ const handleCheckout = async () => {
   padding: 14px 32px;
   background: #111;
   color: white;
-  border-radius: 12px;
+  border-radius: 30px;
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s;
@@ -171,37 +298,93 @@ const handleCheckout = async () => {
   transform: translateY(-2px);
 }
 
-.cart-content {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-}
-
 .cart-items {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .cart-item {
-  background: white;
-  border-radius: 20px;
-  padding: 20px;
-  display: grid;
-  grid-template-columns: 100px 1fr auto;
-  gap: 20px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #F87171;
+}
+
+.item-content {
+  display: flex;
   align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: white;
+  border-radius: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.delete-btn-mobile {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  background: #F87171;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  z-index: 0;
+}
+
+/* Hide mobile delete on desktop, show on mobile */
+@media (min-width: 769px) {
+  .delete-btn-mobile {
+    display: none;
+  }
+  
+  .item-content {
+    transform: none !important;
+  }
+}
+
+.delete-btn-desktop {
+  display: none;
+  width: 40px;
+  height: 40px;
+  background: #FEE2E2;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  color: #EF4444;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.delete-btn-desktop:hover {
+  background: #FECACA;
+  color: #DC2626;
+}
+
+@media (min-width: 769px) {
+  .delete-btn-desktop {
+    display: flex;
+  }
 }
 
 .item-image {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   background: #F9FAFB;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  flex-shrink: 0;
+  padding: 8px;
 }
 
 .item-image img {
@@ -211,126 +394,113 @@ const handleCheckout = async () => {
   mix-blend-mode: multiply;
 }
 
-.item-details {
+.item-info {
   flex: 1;
+  min-width: 0;
 }
 
 .item-name {
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111;
   margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.item-category {
-  font-size: 0.875rem;
-  color: #6B7280;
-  margin-bottom: 8px;
+.item-meta {
+  font-size: 0.8rem;
+  color: #9CA3AF;
+  margin-bottom: 6px;
 }
 
 .item-price {
-  font-size: 1.125rem;
-  font-weight: 800;
+  font-size: 1rem;
+  font-weight: 700;
   color: #111;
 }
 
-.item-actions {
+.item-controls {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: flex-end;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
 }
 
-.quantity-control {
+.item-quantity {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #F9FAFB;
-  border-radius: 10px;
-  padding: 4px;
 }
 
 .qty-btn {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  background: white;
-  border: none;
-  cursor: pointer;
-  font-weight: 700;
-  transition: all 0.2s;
-}
-
-.qty-btn:hover {
-  background: #111;
-  color: white;
-}
-
-.qty-value {
-  min-width: 32px;
-  text-align: center;
-  font-weight: 600;
-}
-
-.btn-remove {
-  color: #EF4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 0.875rem;
+  color: #9CA3AF;
+  transition: color 0.2s;
+}
+
+.qty-btn:hover {
+  color: #111;
+}
+
+.qty-value {
+  min-width: 24px;
+  text-align: center;
   font-weight: 600;
+  font-size: 1rem;
 }
 
-.btn-remove:hover {
-  text-decoration: underline;
-}
-
-.cart-summary {
+.cart-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: white;
-  border-radius: 20px;
-  padding: 24px;
-  height: fit-content;
-  position: sticky;
-  top: 100px;
+  padding: 20px;
+  border-top: 1px solid #E5E7EB;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  z-index: 100;
 }
 
-.summary-title {
+.total-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.total-label {
+  font-size: 0.875rem;
+  color: #9CA3AF;
+}
+
+.total-price {
   font-size: 1.5rem;
   font-weight: 800;
-  margin-bottom: 24px;
-}
-
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  color: #6B7280;
-}
-
-.summary-divider {
-  height: 1px;
-  background: #E5E7EB;
-  margin: 20px 0;
-}
-
-.summary-total {
-  display: flex;
-  justify-content: space-between;
-  font-size: 1.25rem;
-  font-weight: 800;
-  margin-bottom: 24px;
+  color: #111;
 }
 
 .btn-checkout {
-  width: 100%;
-  padding: 16px;
+  padding: 16px 40px;
   background: #111;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 30px;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
+  letter-spacing: 0.5px;
 }
 
 .btn-checkout:hover {
@@ -338,23 +508,82 @@ const handleCheckout = async () => {
   transform: translateY(-2px);
 }
 
-@media (min-width: 1024px) {
+/* Desktop improvements */
+@media (min-width: 769px) {
+  .desktop-header {
+    display: block;
+  }
+  
+  .mobile-header {
+    display: none;
+  }
+  
+  .cart-page {
+    padding-bottom: 0;
+  }
+  
   .cart-content {
-    grid-template-columns: 2fr 1fr;
+    padding: 40px;
+    padding-bottom: 140px;
+    max-width: 900px;
+  }
+  
+  .cart-footer {
+    padding: 24px 40px;
+    max-width: 940px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  }
+  
+  .item-content {
+    padding: 20px;
+    gap: 24px;
+  }
+  
+  .item-image {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .item-name {
+    font-size: 1.125rem;
+  }
+  
+  .cart-item {
+    transition: box-shadow 0.2s;
+  }
+  
+  .cart-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  
+  .empty-cart {
+    margin-top: 40px;
+    padding: 80px 40px;
   }
 }
 
-@media (max-width: 640px) {
-  .cart-item {
-    grid-template-columns: 80px 1fr;
-    gap: 12px;
+/* Mobile swipe hint */
+@media (max-width: 768px) {
+  .cart-item:first-child::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 40px;
+    background: #E5E7EB;
+    border-radius: 2px;
+    opacity: 0;
+    animation: swipeHint 2s ease-in-out 1s;
   }
   
-  .item-actions {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+  @keyframes swipeHint {
+    0%, 100% { opacity: 0; transform: translateY(-50%) translateX(0); }
+    50% { opacity: 1; transform: translateY(-50%) translateX(-10px); }
   }
 }
 </style>

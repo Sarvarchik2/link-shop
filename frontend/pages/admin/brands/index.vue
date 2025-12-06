@@ -51,7 +51,7 @@ const deleteBrand = async (id) => {
     })
     refresh()
   } catch (e) {
-    alert('Failed to delete brand')
+    useToast().error('Failed to delete brand')
   }
 }
 </script>

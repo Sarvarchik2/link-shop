@@ -54,48 +54,101 @@
         <div class="form-section">
           <h2 class="section-title">Images</h2>
           
-          <div class="form-group">
-            <label class="label">Main Image URL</label>
-            <input v-model="form.image_url" required class="input" placeholder="https://..." />
-          </div>
-
-          <div class="form-group">
-            <label class="label">Additional Images (one per line)</label>
-            <textarea 
-              v-model="additionalImages" 
-              rows="3" 
-              class="input" 
-              placeholder="https://image1.jpg&#10;https://image2.jpg&#10;https://image3.jpg"
-            ></textarea>
-            <p class="help-text">Enter each image URL on a new line</p>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h2 class="section-title">Inventory & Sizes</h2>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label class="label">Stock Quantity</label>
-              <input v-model.number="form.stock" type="number" min="0" required class="input" placeholder="0" />
-              <p class="help-text">Set to 0 for out of stock</p>
+          <!-- Image Upload Area -->
+          <div class="images-upload-area">
+            <!-- Uploaded Images Preview -->
+            <div class="images-preview" v-if="uploadedImages.length > 0">
+              <div 
+                v-for="(img, index) in uploadedImages" 
+                :key="index" 
+                class="image-preview-item"
+                :class="{ 'main-image': index === 0 }"
+              >
+                <img :src="img" alt="Product image" />
+                <div class="image-actions">
+                  <button v-if="index !== 0" type="button" @click="setMainImage(index)" class="btn-set-main" title="Set as main">
+                    ⭐
+                  </button>
+                  <button type="button" @click="removeImage(index)" class="btn-remove-image" title="Remove">
+                    ✕
+                  </button>
+                </div>
+                <span v-if="index === 0" class="main-badge">Main</span>
+              </div>
             </div>
             
-            <div class="form-group">
-              <label class="label">Available Sizes</label>
-              <div class="sizes-input">
-                <label v-for="size in availableSizes" :key="size" class="size-checkbox">
-                  <input type="checkbox" :value="size" v-model="selectedSizes" />
-                  <span>{{ size }}</span>
-                </label>
+            <!-- Upload Button -->
+            <div class="upload-zone" @click="triggerFileInput" @dragover.prevent @drop.prevent="handleDrop">
+              <input 
+                ref="fileInput" 
+                type="file" 
+                accept="image/*" 
+                multiple 
+                @change="handleFileSelect" 
+                class="hidden-input" 
+              />
+              <div class="upload-content">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <span class="upload-text">Click or drag images to upload</span>
+                <span class="upload-hint">PNG, JPG up to 5MB</span>
+              </div>
+            </div>
+            
+            <!-- OR URL Input -->
+            <div class="url-input-section">
+              <span class="divider-text">or add by URL</span>
+              <div class="url-input-row">
+                <input v-model="imageUrl" class="input" placeholder="https://example.com/image.jpg" />
+                <button type="button" @click="addImageUrl" class="btn-add-url" :disabled="!imageUrl">Add</button>
               </div>
             </div>
           </div>
+          
+          <p v-if="uploadingImages" class="uploading-text">⏳ Uploading images...</p>
+        </div>
+
+        <div class="form-section">
+          <h2 class="section-title">Sizes</h2>
+          
+          <div class="sizes-list">
+            <div v-for="(size, index) in sizes" :key="index" class="size-row">
+              <input v-model="size.name" class="input size-name-input" placeholder="Size name (e.g. M, 42, One Size)" />
+              <input v-model.number="size.stock" type="number" min="0" class="input stock-input" placeholder="Stock" />
+              <button type="button" @click="removeSize(index)" class="btn-remove">✕</button>
+            </div>
+          </div>
+          
+          <button type="button" @click="addSize" class="btn-add">
+            + Add Size
+          </button>
+          <p class="help-text">Add available sizes with their stock quantities</p>
+        </div>
+
+        <div class="form-section">
+          <h2 class="section-title">Colors</h2>
+          
+          <div class="colors-list">
+            <div v-for="(color, index) in colors" :key="index" class="color-row">
+              <input v-model="color.name" class="input color-name-input" placeholder="Color name (e.g. Black)" />
+              <input v-model="color.hex" type="color" class="color-picker" />
+              <input v-model.number="color.stock" type="number" min="0" class="input stock-input" placeholder="Stock" />
+              <button type="button" @click="removeColor(index)" class="btn-remove">✕</button>
+            </div>
+          </div>
+          
+          <button type="button" @click="addColor" class="btn-add">
+            + Add Color
+          </button>
+          <p class="help-text">Add available colors with their stock quantities</p>
         </div>
 
         <div class="form-actions">
           <NuxtLink to="/admin/products" class="btn btn-secondary">Cancel</NuxtLink>
-          <button type="submit" class="btn btn-primary" :disabled="loading">
+          <button type="submit" class="btn btn-primary" :disabled="loading || uploadedImages.length === 0">
             {{ loading ? 'Creating...' : 'Create Product' }}
           </button>
         </div>
@@ -112,40 +165,129 @@ definePageMeta({
 
 const { token } = useAuth()
 const loading = ref(false)
+const uploadingImages = ref(false)
 const { data: brands } = await useFetch('http://localhost:8000/brands', { server: false })
 const { data: categories } = await useFetch('http://localhost:8000/categories', { server: false })
 
-const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
-const selectedSizes = ref([])
-const additionalImages = ref('')
+const fileInput = ref(null)
+const uploadedImages = ref([])
+const imageUrl = ref('')
+
+const sizes = ref([{ name: '', stock: 0 }])
+const colors = ref([{ name: '', hex: '#000000', stock: 0 }])
+
+// Size functions
+const addSize = () => {
+  sizes.value.push({ name: '', stock: 0 })
+}
+
+const removeSize = (index) => {
+  sizes.value.splice(index, 1)
+}
+
+// Color functions
+const addColor = () => {
+  colors.value.push({ name: '', hex: '#000000', stock: 0 })
+}
+
+const removeColor = (index) => {
+  colors.value.splice(index, 1)
+}
+
+// Image functions
+const triggerFileInput = () => {
+  fileInput.value.click()
+}
+
+const handleFileSelect = async (event) => {
+  const files = event.target.files
+  if (files.length > 0) {
+    await uploadFiles(files)
+  }
+}
+
+const handleDrop = async (event) => {
+  const files = event.dataTransfer.files
+  if (files.length > 0) {
+    await uploadFiles(files)
+  }
+}
+
+const uploadFiles = async (files) => {
+  uploadingImages.value = true
+  
+  for (const file of files) {
+    if (file.type.startsWith('image/')) {
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+        
+        const response = await $fetch('http://localhost:8000/upload', {
+          method: 'POST',
+          body: formData
+        })
+        
+        uploadedImages.value.push(response.url)
+      } catch (e) {
+        console.error('Failed to upload image:', e)
+      }
+    }
+  }
+  
+  uploadingImages.value = false
+}
+
+const addImageUrl = () => {
+  if (imageUrl.value.trim()) {
+    uploadedImages.value.push(imageUrl.value.trim())
+    imageUrl.value = ''
+  }
+}
+
+const removeImage = (index) => {
+  uploadedImages.value.splice(index, 1)
+}
+
+const setMainImage = (index) => {
+  const [img] = uploadedImages.value.splice(index, 1)
+  uploadedImages.value.unshift(img)
+}
 
 const form = reactive({
   name: '',
   brand: '',
   category: '',
   price: 0,
-  image_url: '',
-  description: '',
-  stock: 0,
-  images: null,
-  sizes: null
+  description: ''
 })
 
+const toast = useToast()
+
 const handleSubmit = async () => {
+  if (uploadedImages.value.length === 0) {
+    toast.warning('Please add at least one image')
+    return
+  }
+  
   loading.value = true
   try {
-    // Prepare images array
-    const imagesArray = [form.image_url]
-    if (additionalImages.value.trim()) {
-      const additionalUrls = additionalImages.value.split('\n').filter(url => url.trim())
-      imagesArray.push(...additionalUrls)
-    }
+    // Prepare sizes (filter empty)
+    const validSizes = sizes.value.filter(s => s.name.trim())
     
-    // Prepare form data
+    // Prepare colors (filter empty)
+    const validColors = colors.value.filter(c => c.name.trim())
+    
+    // Calculate total stock
+    const totalStock = validSizes.reduce((acc, s) => acc + (s.stock || 0), 0) +
+                       validColors.reduce((acc, c) => acc + (c.stock || 0), 0)
+    
     const productData = {
       ...form,
-      images: JSON.stringify(imagesArray),
-      sizes: selectedSizes.value.length > 0 ? JSON.stringify(selectedSizes.value) : null
+      image_url: uploadedImages.value[0],
+      images: JSON.stringify(uploadedImages.value),
+      sizes: validSizes.length > 0 ? JSON.stringify(validSizes) : null,
+      colors: validColors.length > 0 ? JSON.stringify(validColors) : null,
+      stock: totalStock || 0
     }
     
     await $fetch('http://localhost:8000/products', {
@@ -154,10 +296,11 @@ const handleSubmit = async () => {
       body: productData
     })
     
+    toast.success('Product created successfully!')
     navigateTo('/admin/products')
   } catch (e) {
     console.error(e)
-    alert('Failed to create product')
+    toast.error('Failed to create product')
   } finally {
     loading.value = false
   }
@@ -269,37 +412,226 @@ const handleSubmit = async () => {
 .help-text {
   font-size: 0.75rem;
   color: #9CA3AF;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
-.sizes-input {
+/* Images Upload */
+.images-upload-area {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.images-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 12px;
 }
 
-.size-checkbox {
+.image-preview-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #E5E7EB;
+}
+
+.image-preview-item.main-image {
+  border-color: #10B981;
+}
+
+.image-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+}
+
+.btn-set-main,
+.btn-remove-image {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+
+.btn-set-main {
+  background: #FEF3C7;
+}
+
+.btn-remove-image {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.main-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  background: #10B981;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.upload-zone {
+  border: 2px dashed #D1D5DB;
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #FAFAFA;
+}
+
+.upload-zone:hover {
+  border-color: #111;
+  background: #F5F5F5;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 8px;
-  padding: 10px 16px;
+  color: #6B7280;
+}
+
+.upload-text {
+  font-weight: 600;
+}
+
+.upload-hint {
+  font-size: 0.75rem;
+  color: #9CA3AF;
+}
+
+.url-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.divider-text {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #9CA3AF;
+}
+
+.url-input-row {
+  display: flex;
+  gap: 12px;
+}
+
+.url-input-row .input {
+  flex: 1;
+}
+
+.btn-add-url {
+  padding: 12px 24px;
+  background: #111;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-url:disabled {
+  background: #D1D5DB;
+  cursor: not-allowed;
+}
+
+.uploading-text {
+  text-align: center;
+  color: #6B7280;
+  font-size: 0.875rem;
+}
+
+/* Sizes & Colors */
+.sizes-list,
+.colors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.size-row,
+.color-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.size-name-input,
+.color-name-input {
+  flex: 1;
+}
+
+.color-picker {
+  width: 50px;
+  height: 44px;
+  padding: 4px;
   border: 2px solid #E5E7EB;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
-  background: white;
 }
 
-.size-checkbox:hover {
-  border-color: #111;
+.stock-input {
+  width: 100px;
 }
 
-.size-checkbox input:checked + span {
-  font-weight: 700;
-}
-
-.size-checkbox input {
+.btn-remove {
+  width: 44px;
+  height: 44px;
+  background: #FEE2E2;
+  border: none;
+  border-radius: 8px;
+  color: #DC2626;
   cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.btn-remove:hover {
+  background: #FECACA;
+}
+
+.btn-add {
+  padding: 12px 20px;
+  background: #F3F4F6;
+  border: 2px dashed #D1D5DB;
+  border-radius: 12px;
+  color: #6B7280;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.btn-add:hover {
+  background: #E5E7EB;
+  border-color: #9CA3AF;
 }
 
 .form-actions {
@@ -361,6 +693,10 @@ const handleSubmit = async () => {
   
   .page-title {
     font-size: 1.5rem;
+  }
+  
+  .images-preview {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 </style>
