@@ -68,9 +68,10 @@ class Product(SQLModel, table=True):
     rating: float = 0.0
     reviews_count: int = 0
     is_favorite: bool = False
-    stock: int = 0  # Quantity in stock
-    sizes: Optional[str] = None  # JSON string of available sizes
-    colors: Optional[str] = None  # JSON string of available colors with stock
+    stock: int = 0  # Quantity in stock (for products without variants)
+    sizes: Optional[str] = None  # JSON string of available sizes (deprecated, use variants)
+    colors: Optional[str] = None  # JSON string of available colors with stock (deprecated, use variants)
+    variants: Optional[str] = None  # JSON string of variants: [{"size": "M", "color": "Black", "colorHex": "#000000", "stock": 5}, ...]
 
 class ProductCreate(SQLModel):
     name: str
@@ -83,6 +84,7 @@ class ProductCreate(SQLModel):
     stock: int = 0
     sizes: Optional[str] = None
     colors: Optional[str] = None
+    variants: Optional[str] = None  # JSON string of variants: [{"size": "M", "color": "Black", "colorHex": "#000000", "stock": 5}, ...]
 
 class OrderItem(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -521,6 +523,33 @@ def get_product(product_id: int):
 
 @app.post("/products", response_model=Product)
 def create_product(product: ProductCreate):
+    # If variants are provided, use them; otherwise validate sizes/colors
+    if product.variants and product.variants.strip():
+        # Variants format: [{"size": "M", "color": "Black", "colorHex": "#000000", "stock": 5}, ...]
+        try:
+            import json
+            variants = json.loads(product.variants)
+            if not isinstance(variants, list):
+                raise HTTPException(status_code=400, detail="Variants must be a JSON array")
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid variants JSON format")
+    else:
+        # Legacy validation: if sizes exist, colors must exist and vice versa
+        has_sizes = product.sizes and product.sizes.strip()
+        has_colors = product.colors and product.colors.strip()
+        
+        if has_sizes and not has_colors:
+            raise HTTPException(
+                status_code=400, 
+                detail="If product has sizes, colors must also be specified"
+            )
+        
+        if has_colors and not has_sizes:
+            raise HTTPException(
+                status_code=400, 
+                detail="If product has colors, sizes must also be specified"
+            )
+    
     with Session(engine) as session:
         db_product = Product.from_orm(product)
         session.add(db_product)
@@ -540,6 +569,33 @@ def delete_product(product_id: int, current_user: User = Depends(get_current_adm
 
 @app.put("/products/{product_id}", response_model=Product)
 def update_product(product_id: int, product_update: ProductCreate, current_user: User = Depends(get_current_admin)):
+    # If variants are provided, use them; otherwise validate sizes/colors
+    if product_update.variants and product_update.variants.strip():
+        # Variants format: [{"size": "M", "color": "Black", "colorHex": "#000000", "stock": 5}, ...]
+        try:
+            import json
+            variants = json.loads(product_update.variants)
+            if not isinstance(variants, list):
+                raise HTTPException(status_code=400, detail="Variants must be a JSON array")
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid variants JSON format")
+    else:
+        # Legacy validation: if sizes exist, colors must exist and vice versa
+        has_sizes = product_update.sizes and product_update.sizes.strip()
+        has_colors = product_update.colors and product_update.colors.strip()
+        
+        if has_sizes and not has_colors:
+            raise HTTPException(
+                status_code=400, 
+                detail="If product has sizes, colors must also be specified"
+            )
+        
+        if has_colors and not has_sizes:
+            raise HTTPException(
+                status_code=400, 
+                detail="If product has colors, sizes must also be specified"
+            )
+    
     with Session(engine) as session:
         product = session.get(Product, product_id)
         if not product:
@@ -554,6 +610,7 @@ def update_product(product_id: int, product_update: ProductCreate, current_user:
         product.stock = product_update.stock
         product.sizes = product_update.sizes
         product.colors = product_update.colors
+        product.variants = product_update.variants
         product.images = product_update.images
         
         session.add(product)

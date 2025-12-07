@@ -38,7 +38,43 @@
           :class="{ active: selectedStatus === status.value }"
           @click="selectedStatus = status.value"
       >
-          <span class="filter-icon">{{ status.icon }}</span>
+          <span class="filter-icon">
+            <!-- All -->
+            <svg v-if="status.value === 'all'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <!-- Pending -->
+            <svg v-else-if="status.value === 'pending'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <!-- Processing -->
+            <svg v-else-if="status.value === 'processing'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
+            </svg>
+            <!-- Shipping -->
+            <svg v-else-if="status.value === 'shipping'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+            <!-- Delivered -->
+            <svg v-else-if="status.value === 'delivered'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <!-- Cancelled -->
+            <svg v-else-if="status.value === 'cancelled'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+          </span>
           {{ status.label }}
       </button>
     </div>
@@ -142,7 +178,13 @@
 
             <!-- Delivery Info -->
             <div v-if="order.delivery_address" class="delivery-section">
-              <h3 class="section-label">📍 Delivery Address</h3>
+              <h3 class="section-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Delivery Address
+              </h3>
               <div class="delivery-info">
                 <p class="delivery-name">{{ order.recipient_name }}</p>
                 <p class="delivery-address">{{ order.delivery_address }}, {{ order.delivery_city }}</p>
@@ -152,7 +194,13 @@
 
             <!-- Payment Method -->
             <div class="payment-section">
-              <h3 class="section-label">💳 Payment Method</h3>
+              <h3 class="section-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                Payment Method
+              </h3>
               <div class="payment-badge" :class="order.payment_method">
                 {{ order.payment_method === 'cash' ? 'Cash on Delivery' : 'Card Payment' }}
           </div>
@@ -160,7 +208,14 @@
 
             <!-- All Items -->
             <div class="items-section">
-              <h3 class="section-label">📦 Items ({{ order.items?.length || 0 }})</h3>
+              <h3 class="section-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                Items ({{ order.items?.length || 0 }})
+              </h3>
               <div class="items-list">
                 <div v-for="(item, idx) in order.items" :key="idx" class="item-full">
                   <img :src="item.product_image" :alt="item.product_name" class="item-img-full" />
@@ -195,12 +250,12 @@ const { data: orders, pending } = await useFetch('http://localhost:8000/orders/m
 })
 
 const statuses = [
-  { value: 'all', label: 'All', icon: '📋' },
-  { value: 'pending', label: 'Pending', icon: '⏳' },
-  { value: 'processing', label: 'Processing', icon: '⚙️' },
-  { value: 'shipping', label: 'Shipping', icon: '🚚' },
-  { value: 'delivered', label: 'Delivered', icon: '✅' },
-  { value: 'cancelled', label: 'Cancelled', icon: '❌' }
+  { value: 'all', label: 'All' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'processing', label: 'Processing' },
+  { value: 'shipping', label: 'Shipping' },
+  { value: 'delivered', label: 'Delivered' },
+  { value: 'cancelled', label: 'Cancelled' }
 ]
 
 const selectedStatus = ref('all')
@@ -326,6 +381,7 @@ const isStatusCompleted = (currentStatus, checkStatus) => {
   padding-bottom: 40px;
   max-width: 600px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .search-box {
@@ -398,7 +454,15 @@ const isStatusCompleted = (currentStatus, checkStatus) => {
 }
 
 .filter-icon {
-  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.filter-icon svg {
+  width: 18px;
+  height: 18px;
 }
 
 .loading-state {
@@ -663,6 +727,14 @@ const isStatusCompleted = (currentStatus, checkStatus) => {
   font-weight: 700;
   color: #374151;
   margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-label svg {
+  flex-shrink: 0;
+  color: #6B7280;
 }
 
 .timeline-section {
@@ -834,56 +906,161 @@ const isStatusCompleted = (currentStatus, checkStatus) => {
   
   .orders-page {
     padding-bottom: 40px;
+    background: #FAFAFA;
   }
   
   .orders-content {
     padding: 40px;
-    max-width: 900px;
+    max-width: 1200px;
+    margin: 0 auto;
   }
   
   .search-box {
-    max-width: 400px;
+    max-width: 500px;
+    margin-bottom: 24px;
   }
   
   .status-filters {
     justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
   }
   
   .filter-btn {
-    padding: 12px 20px;
+    padding: 12px 24px;
+    font-size: 0.95rem;
   }
   
   .orders-list {
-    gap: 20px;
+    gap: 24px;
+    display: grid;
+    grid-template-columns: 1fr;
   }
   
   .order-card {
-    border-radius: 20px;
+    border-radius: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
   }
   
   .order-header {
-    padding: 24px;
+    padding: 24px 28px;
+  }
+  
+  .order-items-preview {
+    padding: 20px 28px;
   }
   
   .item-preview {
-    padding: 16px;
+    padding: 12px 0;
   }
   
   .item-img {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
+  }
+  
+  .item-name {
+    font-size: 0.95rem;
+  }
+  
+  .order-footer {
+    padding: 20px 28px;
+  }
+  
+  .order-details {
+    padding: 28px;
+  }
+  
+  .timeline {
+    padding: 0 40px;
+  }
+  
+  .timeline::before {
+    left: 40px;
+    right: 40px;
   }
   
   .empty-state {
-    padding: 80px 40px;
-    margin-top: 20px;
+    padding: 100px 60px;
+    margin-top: 40px;
     border-radius: 24px;
+  }
+  
+  .empty-title {
+    font-size: 1.75rem;
   }
 }
 
 @media (min-width: 1024px) {
   .orders-content {
-    max-width: 1000px;
+    padding: 48px 60px;
+    max-width: 1400px;
+  }
+  
+  .search-box {
+    max-width: 600px;
+  }
+  
+  .orders-list {
+    gap: 28px;
+  }
+  
+  .order-card {
+    border-radius: 28px;
+  }
+  
+  .order-header {
+    padding: 28px 32px;
+  }
+  
+  .order-items-preview {
+    padding: 24px 32px;
+  }
+  
+  .order-footer {
+    padding: 24px 32px;
+  }
+  
+  .order-details {
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  
+  .timeline-section {
+    grid-column: 1 / -1;
+  }
+  
+  .delivery-section,
+  .payment-section,
+  .items-section {
+    margin-bottom: 0;
+  }
+  
+  .item-full {
+    padding: 16px 20px;
+  }
+  
+  .item-img-full {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .orders-content {
+    padding: 60px 80px;
+  }
+  
+  .orders-list {
+    gap: 32px;
   }
 }
 </style>

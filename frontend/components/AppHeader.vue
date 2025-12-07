@@ -17,7 +17,6 @@
           <NuxtLink to="/" class="nav-link">Home</NuxtLink>
           <NuxtLink to="/products" class="nav-link">Products</NuxtLink>
           <NuxtLink to="/orders" class="nav-link">Orders</NuxtLink>
-          <NuxtLink to="/favorites" class="nav-link">Favorites</NuxtLink>
         </nav>
 
         <!-- Actions -->

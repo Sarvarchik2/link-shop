@@ -110,40 +110,33 @@
             </div>
           </div>
           
-          <p v-if="uploadingImages" class="uploading-text">⏳ Uploading images...</p>
+          <p v-if="uploadingImages" class="uploading-text">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            Uploading images...
+          </p>
         </div>
 
         <div class="form-section">
-          <h2 class="section-title">Sizes</h2>
+          <h2 class="section-title">Product Variants</h2>
+          <p class="help-text">Add combinations of size and color with stock quantities</p>
           
-          <div class="sizes-list">
-            <div v-for="(size, index) in sizes" :key="index" class="size-row">
-              <input v-model="size.name" class="input size-name-input" placeholder="Size name (e.g. M, 42, One Size)" />
-              <input v-model.number="size.stock" type="number" min="0" class="input stock-input" placeholder="Stock" />
-              <button type="button" @click="removeSize(index)" class="btn-remove">✕</button>
-            </div>
-            </div>
-            
-          <button type="button" @click="addSize" class="btn-add">
-            + Add Size
-          </button>
-          <p class="help-text">Add available sizes with their stock quantities</p>
-              </div>
-
-        <div class="form-section">
-          <h2 class="section-title">Colors</h2>
-          
-          <div class="colors-list">
-            <div v-for="(color, index) in colors" :key="index" class="color-row">
-              <input v-model="color.name" class="input color-name-input" placeholder="Color name" />
-              <input v-model="color.hex" type="color" class="color-picker" />
-              <input v-model.number="color.stock" type="number" min="0" class="input stock-input" placeholder="Stock" />
-              <button type="button" @click="removeColor(index)" class="btn-remove">✕</button>
+          <div class="variants-list">
+            <div v-for="(variant, index) in variants" :key="index" class="variant-row">
+              <input v-model="variant.size" class="input variant-size-input" placeholder="Size (e.g. M, L)" />
+              <input v-model="variant.color" class="input variant-color-input" placeholder="Color (e.g. Black)" />
+              <input v-model="variant.colorHex" type="color" class="color-picker" title="Color picker" />
+              <input v-model.number="variant.stock" type="number" min="0" class="input stock-input" placeholder="Stock" />
+              <button type="button" @click="removeVariant(index)" class="btn-remove">✕</button>
             </div>
           </div>
           
-          <button type="button" @click="addColor" class="btn-add">+ Add Color</button>
-          <p class="help-text">Add available colors with their stock quantities</p>
+          <button type="button" @click="addVariant" class="btn-add">
+            + Add Variant
+          </button>
+          <p class="help-text">Each variant is a combination of size + color + stock quantity</p>
         </div>
 
         <div class="form-actions">
@@ -180,25 +173,15 @@ const fileInput = ref(null)
 const uploadedImages = ref([])
 const imageUrl = ref('')
 
-const sizes = ref([])
-const colors = ref([])
+const variants = ref([{ size: '', color: '', colorHex: '#000000', stock: 0 }])
 
-// Size functions
-const addSize = () => {
-  sizes.value.push({ name: '', stock: 0 })
+// Variant functions
+const addVariant = () => {
+  variants.value.push({ size: '', color: '', colorHex: '#000000', stock: 0 })
 }
 
-const removeSize = (index) => {
-  sizes.value.splice(index, 1)
-}
-
-// Color functions
-const addColor = () => {
-  colors.value.push({ name: '', hex: '#000000', stock: 0 })
-}
-
-const removeColor = (index) => {
-  colors.value.splice(index, 1)
+const removeVariant = (index) => {
+  variants.value.splice(index, 1)
 }
 
 // Image functions
@@ -285,25 +268,40 @@ watch(product, (newProduct) => {
       uploadedImages.value = newProduct.image_url ? [newProduct.image_url] : []
     }
     
-    // Parse sizes - now expecting array of objects with name and stock
+    // Parse variants (new format) or fallback to sizes/colors (legacy)
     try {
-      const parsedSizes = newProduct.sizes ? JSON.parse(newProduct.sizes) : []
-      // Handle both old format (array of strings) and new format (array of objects)
-      sizes.value = parsedSizes.map(s => {
-        if (typeof s === 'string') {
-          return { name: s, stock: 0 }
+      if (newProduct.variants) {
+        variants.value = JSON.parse(newProduct.variants)
+        if (variants.value.length === 0) {
+          variants.value = [{ size: '', color: '', colorHex: '#000000', stock: 0 }]
         }
-        return s
-      })
+      } else if (newProduct.sizes && newProduct.colors) {
+        // Legacy: convert sizes + colors to variants
+        const parsedSizes = JSON.parse(newProduct.sizes)
+        const parsedColors = JSON.parse(newProduct.colors)
+        variants.value = []
+        parsedSizes.forEach(size => {
+          const sizeName = typeof size === 'string' ? size : size.name
+          parsedColors.forEach(color => {
+            const colorObj = typeof color === 'string' ? { name: color, hex: '#000000', stock: 0 } : color
+            // Use color stock if available, otherwise use product stock divided by variants
+            const variantStock = colorObj.stock || 0
+            variants.value.push({
+              size: sizeName,
+              color: colorObj.name || color,
+              colorHex: colorObj.hex || '#000000',
+              stock: variantStock
+            })
+          })
+        })
+        if (variants.value.length === 0) {
+          variants.value = [{ size: '', color: '', colorHex: '#000000', stock: 0 }]
+        }
+      } else {
+        variants.value = [{ size: '', color: '', colorHex: '#000000', stock: 0 }]
+      }
     } catch {
-      sizes.value = []
-    }
-    
-    // Parse colors
-    try {
-      colors.value = newProduct.colors ? JSON.parse(newProduct.colors) : []
-    } catch {
-      colors.value = []
+      variants.value = [{ size: '', color: '', colorHex: '#000000', stock: 0 }]
     }
   }
 }, { immediate: true })
@@ -316,24 +314,21 @@ const handleSubmit = async () => {
     return
   }
   
+  // Filter valid variants (both size and color must be filled)
+  const validVariants = variants.value.filter(v => v.size.trim() && v.color.trim())
+  
+  // Calculate total stock from variants
+  const totalStock = validVariants.reduce((acc, v) => acc + (v.stock || 0), 0)
+  
   loading.value = true
   try {
-    // Prepare sizes (filter empty)
-    const validSizes = sizes.value.filter(s => s.name.trim())
-    
-    // Prepare colors (filter empty)
-    const validColors = colors.value.filter(c => c.name.trim())
-    
-    // Calculate total stock
-    const totalStock = validSizes.reduce((acc, s) => acc + (s.stock || 0), 0) +
-                       validColors.reduce((acc, c) => acc + (c.stock || 0), 0)
-    
     const productData = {
       ...form.value,
       image_url: uploadedImages.value[0],
       images: JSON.stringify(uploadedImages.value),
-      sizes: validSizes.length > 0 ? JSON.stringify(validSizes) : null,
-      colors: validColors.length > 0 ? JSON.stringify(validColors) : null,
+      variants: validVariants.length > 0 ? JSON.stringify(validVariants) : null,
+      sizes: null, // Legacy field
+      colors: null, // Legacy field
       stock: totalStock || 0
     }
     
@@ -613,29 +608,31 @@ const handleSubmit = async () => {
 }
 
 .uploading-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   text-align: center;
   color: #6B7280;
   font-size: 0.875rem;
 }
 
-/* Sizes & Colors */
-.sizes-list,
-.colors-list {
+/* Variants */
+.variants-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-bottom: 16px;
 }
 
-.size-row,
-.color-row {
+.variant-row {
   display: flex;
   gap: 12px;
   align-items: center;
 }
 
-.size-name-input,
-.color-name-input {
+.variant-size-input,
+.variant-color-input {
   flex: 1;
 }
 

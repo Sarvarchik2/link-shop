@@ -1,18 +1,52 @@
 <template>
-  <div class="auth-page container flex justify-center items-center h-screen">
-    <div class="card p-8 w-full max-w-md">
-      <h1 class="text-2xl font-bold mb-6 text-center">Admin Login</h1>
-      <form @submit.prevent="handleLogin" class="grid gap-4">
-        <div>
-          <label class="block text-sm font-medium mb-1">Username</label>
-          <input v-model="username" type="text" required class="input w-full" placeholder="admin" />
+  <div class="login-page">
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <h1 class="login-title">Admin Login</h1>
         </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">Password</label>
-          <input v-model="password" type="password" required class="input w-full" placeholder="••••••••" />
+        
+        <form @submit.prevent="handleLogin" class="login-form">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input 
+              v-model="username" 
+              type="text" 
+              required 
+              class="form-input" 
+              placeholder="Enter your username"
+              autocomplete="username"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input 
+              v-model="password" 
+              type="password" 
+              required 
+              class="form-input" 
+              placeholder="Enter your password"
+              autocomplete="current-password"
+            />
+          </div>
+          
+          <button type="submit" class="btn-submit" :disabled="loading">
+            <span v-if="!loading">Login to Dashboard</span>
+            <span v-else class="loading-spinner">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              </svg>
+            </span>
+          </button>
+        </form>
+        
+        <div class="form-footer">
+          <NuxtLink to="/" class="footer-link">
+            ← Back to Shop
+          </NuxtLink>
         </div>
-        <button type="submit" class="btn btn-primary w-full">Login to Dashboard</button>
-      </form>
+      </div>
     </div>
   </div>
 </template>
@@ -24,13 +58,16 @@ definePageMeta({
 
 const username = ref('')
 const password = ref('')
+const loading = ref(false)
 const { login, user, token } = useAuth()
 
 const handleLogin = async () => {
+  loading.value = true
   try {
     await login(username.value, password.value, false)
     
     if (user.value && user.value.role === 'admin') {
+      useToast().success('Welcome back!')
       navigateTo('/admin')
     } else {
       useToast().error('Access denied. Admin privileges required.')
@@ -40,46 +77,158 @@ const handleLogin = async () => {
   } catch (e) {
     console.error(e)
     useToast().error('Invalid username or password')
+  } finally {
+    loading.value = false
   }
 }
 </script>
 
 <style scoped>
-.h-screen { min-height: 100vh; display: flex; align-items: center; }
-.auth-page { background: #FAFAFA; }
-.card {
+.login-page {
+  min-height: 100vh;
+  background: #FAFAFA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 440px;
+}
+
+.login-card {
   background: white;
   border-radius: 24px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  padding: 48px 40px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
-.input {
-  padding: 12px;
-  border: 1px solid #eee;
+
+.login-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.login-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #111;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.025em;
+}
+
+.form-input {
+  padding: 16px 20px;
+  border: 2px solid #E5E7EB;
   border-radius: 12px;
-  background: #f9f9f9;
-  transition: all 0.2s;
   font-size: 1rem;
+  transition: all 0.3s;
+  background: #F9FAFB;
+  color: #111;
 }
-.input:focus {
+
+.form-input::placeholder {
+  color: #9CA3AF;
+}
+
+.form-input:focus {
   outline: none;
   border-color: #111;
   background: white;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
 }
-.btn {
-  padding: 14px;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-  font-size: 1rem;
-}
-.btn-primary {
+
+.btn-submit {
+  padding: 18px;
   background: #111;
   color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
-.btn-primary:hover {
+
+.btn-submit:hover:not(:disabled) {
   background: #000;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.btn-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.footer-link {
+  color: #111;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .login-card {
+    padding: 32px 24px;
+  }
+  
+  .login-title {
+    font-size: 2rem;
+  }
 }
 </style>

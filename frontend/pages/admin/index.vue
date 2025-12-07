@@ -102,7 +102,12 @@
         <h2 class="section-title">Orders by Status</h2>
         <div class="status-grid">
           <div class="status-card pending">
-            <div class="status-icon">⏳</div>
+            <div class="status-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
             <div class="status-info">
               <span class="status-count">{{ stats?.orders_by_status?.pending || 0 }}</span>
               <span class="status-label">Pending</span>
@@ -113,7 +118,12 @@
           </div>
 
           <div class="status-card processing">
-            <div class="status-icon">🔄</div>
+            <div class="status-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
+              </svg>
+            </div>
             <div class="status-info">
               <span class="status-count">{{ stats?.orders_by_status?.processing || 0 }}</span>
               <span class="status-label">Processing</span>
@@ -124,7 +134,14 @@
           </div>
 
           <div class="status-card shipping">
-            <div class="status-icon">🚚</div>
+            <div class="status-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+              </svg>
+            </div>
             <div class="status-info">
               <span class="status-count">{{ stats?.orders_by_status?.shipping || 0 }}</span>
               <span class="status-label">Shipping</span>
@@ -135,7 +152,12 @@
           </div>
 
           <div class="status-card delivered">
-            <div class="status-icon">✅</div>
+            <div class="status-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
             <div class="status-info">
               <span class="status-count">{{ stats?.orders_by_status?.delivered || 0 }}</span>
               <span class="status-label">Delivered</span>
@@ -146,7 +168,13 @@
           </div>
 
           <div class="status-card cancelled">
-            <div class="status-icon">❌</div>
+            <div class="status-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
+            </div>
             <div class="status-info">
               <span class="status-count">{{ stats?.orders_by_status?.cancelled || 0 }}</span>
               <span class="status-label">Cancelled</span>
@@ -243,7 +271,13 @@
           </NuxtLink>
 
           <NuxtLink to="/admin/orders" class="action-card" :class="{ highlight: (stats?.orders_by_status?.pending || 0) > 0 }">
-            <div class="action-icon orders">📦</div>
+            <div class="action-icon orders">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+            </div>
             <div class="action-text">
               <div class="action-title">
                 Manage Orders
@@ -559,7 +593,15 @@ const formatDate = (date) => {
 }
 
 .status-icon {
-  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.status-icon svg {
+  width: 24px;
+  height: 24px;
 }
 
 .status-info {
@@ -713,7 +755,13 @@ const formatDate = (date) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.action-icon svg {
+  width: 24px;
+  height: 24px;
+}
   background: #E5E7EB;
 }
 

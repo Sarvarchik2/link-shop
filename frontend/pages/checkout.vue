@@ -87,7 +87,12 @@
               
               <label class="payment-option" :class="{ active: form.payment_method === 'card' }">
                 <input type="radio" v-model="form.payment_method" value="card" />
-                <div class="payment-icon">💳</div>
+                <div class="payment-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                  </svg>
+                </div>
                 <div class="payment-info">
                   <span class="payment-name">Card Payment</span>
                   <span class="payment-desc">Pay with card on delivery</span>
@@ -429,7 +434,15 @@ if (items.value.length === 0) {
 }
 
 .payment-icon {
-  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.payment-icon svg {
+  width: 24px;
+  height: 24px;
 }
 
 .payment-info {

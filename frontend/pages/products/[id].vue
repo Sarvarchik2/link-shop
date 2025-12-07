@@ -32,13 +32,31 @@
 
           <div class="product-price-section">
             <div class="product-price">${{ product.price.toFixed(2) }}</div>
-            <div v-if="product.stock === 0" class="stock-badge out-of-stock">SOLD OUT</div>
-            <div v-else-if="product.stock <= 5" class="stock-badge low-stock">Only {{ product.stock }} left!</div>
-            <div v-else class="stock-badge in-stock">In Stock ({{ product.stock }})</div>
+            <!-- Stock badge based on selected variant -->
+            <template v-if="productVariants.length > 0">
+              <div v-if="totalColorStock === 0" class="stock-badge out-of-stock">SOLD OUT</div>
+              <div v-else-if="selectedColor && selectedSize && selectedVariant">
+                <div v-if="selectedVariant.stock === 0" class="stock-badge out-of-stock">{{ selectedSize }} / {{ selectedColor.name }} - SOLD OUT</div>
+                <div v-else-if="selectedVariant.stock <= 5" class="stock-badge low-stock">{{ selectedSize }} / {{ selectedColor.name }}: Only {{ selectedVariant.stock }} left!</div>
+                <div v-else class="stock-badge in-stock">{{ selectedSize }} / {{ selectedColor.name }}: In Stock ({{ selectedVariant.stock }})</div>
+              </div>
+              <div v-else-if="selectedColor && !selectedSize" class="stock-badge select-color">Select size to see availability</div>
+              <div v-else-if="!selectedColor && selectedSize" class="stock-badge select-color">Select color to see availability</div>
+              <div v-else class="stock-badge select-color">Select size and color to see availability</div>
+            </template>
+            <!-- Stock badge for products without variants -->
+            <template v-else>
+              <div v-if="product.stock === 0" class="stock-badge out-of-stock">SOLD OUT</div>
+              <div v-else-if="product.stock <= 5" class="stock-badge low-stock">Only {{ product.stock }} left!</div>
+              <div v-else class="stock-badge in-stock">In Stock ({{ product.stock }})</div>
+            </template>
           </div>
 
           <div v-if="productColors.length > 0" class="color-selector">
-            <h3 class="section-title">Select Color</h3>
+            <h3 class="section-title">
+              Select Color
+              <span v-if="productSizes.length > 0" class="required-badge">*</span>
+            </h3>
             <div class="colors">
               <button 
                 v-for="color in productColors" 
@@ -58,7 +76,10 @@
           </div>
 
           <div v-if="productSizes.length > 0" class="size-selector">
-            <h3 class="section-title">Select Size</h3>
+            <h3 class="section-title">
+              Select Size
+              <span v-if="productColors.length > 0" class="required-badge">*</span>
+            </h3>
             <div class="sizes">
               <button 
                 v-for="size in productSizes" 
@@ -102,7 +123,7 @@
                 <circle cx="20" cy="21" r="1"></circle>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
               </svg>
-              {{ product.stock === 0 ? 'Out of Stock' : 'ADD TO CART' }}
+              {{ buttonText }}
             </button>
             <button @click="toggleFavorite" class="btn-favorite" :class="{ active: product.is_favorite }">
               <svg width="20" height="20" viewBox="0 0 24 24" :fill="product.is_favorite ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
@@ -139,23 +160,149 @@ const productImages = computed(() => {
   }
 })
 
-const productSizes = computed(() => {
+// Parse variants (new format) or fallback to sizes/colors (legacy)
+const productVariants = computed(() => {
   if (!product.value) return []
   try {
-    return product.value.sizes ? JSON.parse(product.value.sizes) : []
+    // New format: variants
+    if (product.value.variants) {
+      return JSON.parse(product.value.variants)
+    }
+    // Legacy format: sizes + colors
+    if (product.value.sizes && product.value.colors) {
+      const sizes = JSON.parse(product.value.sizes)
+      const colors = JSON.parse(product.value.colors)
+      const variants = []
+      sizes.forEach(size => {
+        const sizeName = typeof size === 'string' ? size : (size.name || size)
+        colors.forEach(color => {
+          const colorObj = typeof color === 'string' ? { name: color, hex: '#000000', stock: 0 } : color
+          variants.push({
+            size: sizeName,
+            color: colorObj.name || color,
+            colorHex: colorObj.hex || '#000000',
+            stock: colorObj.stock || 0
+          })
+        })
+      })
+      return variants
+    }
+    return []
   } catch {
     return []
   }
 })
 
-const productColors = computed(() => {
-  if (!product.value) return []
-  try {
-    return product.value.colors ? JSON.parse(product.value.colors) : []
-  } catch {
-    return []
-  }
+// Get unique sizes from variants
+const productSizes = computed(() => {
+  const sizes = [...new Set(productVariants.value.map(v => v.size).filter(Boolean))]
+  return sizes
 })
+
+// Get unique colors from variants
+const productColors = computed(() => {
+  const colorMap = new Map()
+  productVariants.value.forEach(v => {
+    if (v.color) {
+      if (!colorMap.has(v.color)) {
+        // Get colorHex from first variant with this color, with fallback
+        const firstVariant = productVariants.value.find(v2 => v2.color === v.color)
+        const hex = firstVariant?.colorHex || v.colorHex || getDefaultColorHex(v.color)
+        colorMap.set(v.color, {
+          name: v.color,
+          hex: hex,
+          stock: 0 // Will calculate from variants
+        })
+      }
+    }
+  })
+  // Calculate stock for each color
+  colorMap.forEach((color, colorName) => {
+    color.stock = productVariants.value
+      .filter(v => v.color === colorName)
+      .reduce((sum, v) => sum + (v.stock || 0), 0)
+  })
+  return Array.from(colorMap.values())
+})
+
+// Helper function to get default hex for common color names
+const getDefaultColorHex = (colorName) => {
+  const colorMap = {
+    'black': '#000000',
+    'white': '#FFFFFF',
+    'red': '#FF0000',
+    'blue': '#0000FF',
+    'green': '#008000',
+    'yellow': '#FFFF00',
+    'gold': '#FFD700',
+    'silver': '#C0C0C0',
+    'brown': '#A52A2A',
+    'tortoise': '#8B4513',
+    'matte black': '#1a1a1a',
+    'polished black': '#000000',
+    'shiny black': '#000000'
+  }
+  return colorMap[colorName.toLowerCase()] || '#000000'
+}
+
+// Get available colors (with stock > 0)
+const availableColors = computed(() => {
+  return productColors.value.filter(c => c.stock > 0)
+})
+
+// Get available sizes based on selected color
+const availableSizes = computed(() => {
+  if (!selectedColor.value) return productSizes.value
+  // Get sizes that have stock for selected color
+  return productSizes.value.filter(size => {
+    const variant = productVariants.value.find(v => 
+      v.size === size && v.color === selectedColor.value.name && (v.stock || 0) > 0
+    )
+    return !!variant
+  })
+})
+
+// Get selected variant (based on selected size and color)
+const selectedVariant = computed(() => {
+  if (!selectedColor.value || !selectedSize.value) return null
+  return productVariants.value.find(v => 
+    v.color === selectedColor.value.name && v.size === selectedSize.value
+  )
+})
+
+// Total available stock (sum of all variant stocks)
+const totalColorStock = computed(() => {
+  if (productVariants.value.length === 0) return product.value?.stock || 0
+  return productVariants.value.reduce((sum, v) => sum + (v.stock || 0), 0)
+})
+
+// Auto-select first available color and size on load
+watch(product, (newProduct) => {
+  if (newProduct) {
+    // If product has sizes, color is required
+    if (productSizes.value.length > 0 && productColors.value.length > 0) {
+      const firstAvailable = productColors.value.find(c => c.stock > 0)
+      if (firstAvailable) {
+        selectedColor.value = firstAvailable
+      }
+      // Auto-select first size
+      const firstSize = productSizes.value[0]
+      selectedSize.value = typeof firstSize === 'object' ? firstSize.name : firstSize
+    }
+    // If product has colors but no sizes, auto-select color
+    else if (productColors.value.length > 0 && productSizes.value.length === 0) {
+      const firstAvailable = productColors.value.find(c => c.stock > 0)
+      if (firstAvailable) {
+        selectedColor.value = firstAvailable
+      }
+    }
+    // If product has sizes but no colors, auto-select size
+    else if (productSizes.value.length > 0 && productColors.value.length === 0) {
+      const firstSize = productSizes.value[0]
+      selectedSize.value = typeof firstSize === 'object' ? firstSize.name : firstSize
+    }
+  }
+}, { immediate: true })
 
 const selectColor = (color) => {
   if (color.stock > 0) {
@@ -166,42 +313,95 @@ const selectColor = (color) => {
 const selectSize = (size) => {
   // Handle both object format { name, stock } and string format
   if (typeof size === 'object') {
-    if (size.stock > 0) {
-      selectedSize.value = size.name
-    }
+    selectedSize.value = size.name
   } else {
     selectedSize.value = size
   }
 }
 
 const canAddToCart = computed(() => {
-  if (!product.value || product.value.stock === 0) return false
-  // If product has colors, a color must be selected
-  if (productColors.value.length > 0 && !selectedColor.value) return false
-  // If product has sizes, a size must be selected
-  if (productSizes.value.length > 0 && !selectedSize.value) return false
+  if (!product.value) return false
+  
+  // If product has variants (sizes + colors)
+  if (productVariants.value.length > 0) {
+    // Both size and color must be selected
+    if (!selectedColor.value || !selectedSize.value) return false
+    // Check if selected variant has stock
+    const variant = selectedVariant.value
+    if (!variant || (variant.stock || 0) === 0) return false
+  }
+  // No variants - check general stock
+  else {
+    if (product.value.stock === 0) return false
+  }
+  
   return true
+})
+
+const buttonText = computed(() => {
+  if (!product.value) return 'Loading...'
+  
+  // If product has variants
+  if (productVariants.value.length > 0) {
+    if (!selectedColor.value) return 'Select Color'
+    if (!selectedSize.value) return 'Select Size'
+    const variant = selectedVariant.value
+    if (!variant || (variant.stock || 0) === 0) return 'Out of Stock'
+  }
+  // No variants - check general stock
+  else if (product.value.stock === 0) {
+    return 'Out of Stock'
+  }
+  
+  return 'ADD TO CART'
 })
 
 const toast = useToast()
 
 const addToCart = () => {
   if (!canAddToCart.value) {
-    if (productColors.value.length > 0 && !selectedColor.value) {
-      toast.warning('Please select a color')
-      return
+    // If product has sizes, color is required
+    if (productSizes.value.length > 0) {
+      if (productColors.value.length > 0) {
+        // Has both sizes and colors
+        if (!selectedColor.value) {
+          toast.warning('Please select a color')
+          return
+        }
+        if (selectedColor.value.stock === 0) {
+          toast.error('This color is out of stock')
+          return
+        }
+        if (!selectedSize.value) {
+          toast.warning('Please select a size')
+          return
+        }
+      } else {
+        // Has sizes but no colors
+        if (!selectedSize.value) {
+          toast.warning('Please select a size')
+          return
+        }
+      }
     }
-    if (productSizes.value.length > 0 && !selectedSize.value) {
-      toast.warning('Please select a size')
-      return
+    // If product has colors but no sizes, color is required
+    else if (productColors.value.length > 0) {
+      if (!selectedColor.value) {
+        toast.warning('Please select a color')
+        return
+      }
+      if (selectedColor.value.stock === 0) {
+        toast.error('This color is out of stock')
+        return
+      }
     }
     return
   }
   
   addItem({
     ...product.value,
-    selectedColor: selectedColor.value,
-    selectedSize: selectedSize.value
+    selectedColor: selectedColor.value || null,
+    selectedSize: selectedSize.value || null
   })
   toast.success('Added to cart!')
 }
@@ -348,6 +548,11 @@ const toggleFavorite = async () => {
   color: #991B1B;
 }
 
+.select-color {
+  background: #E5E7EB;
+  color: #6B7280;
+}
+
 .color-selector {
   padding: 24px 0;
   border-top: 1px solid #E5E7EB;
@@ -419,6 +624,15 @@ const toggleFavorite = async () => {
   font-weight: 700;
   margin-bottom: 12px;
   color: #111;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.required-badge {
+  color: #EF4444;
+  font-size: 1.25rem;
+  line-height: 1;
 }
 
 .sizes {

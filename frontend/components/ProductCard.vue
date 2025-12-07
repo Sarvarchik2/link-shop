@@ -1,13 +1,13 @@
 <template>
   <div class="product-card" @click="navigateTo(`/products/${product.id}`)">
     <div class="product-image">
-      <button class="fav-btn" @click.stop="toggleFav">
-        <svg width="20" height="20" viewBox="0 0 24 24" :fill="product.is_favorite ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" :class="product.is_favorite ? 'text-red-500' : 'text-gray-400'">
+      <button class="fav-btn" :class="{ 'is-fav': isFavoriteDisplay }" @click.stop="toggleFav">
+        <svg width="20" height="20" viewBox="0 0 24 24" :fill="isFavoriteDisplay ? '#EF4444' : 'none'" :stroke="isFavoriteDisplay ? '#EF4444' : '#9CA3AF'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
         </svg>
       </button>
-      <div v-if="product.stock === 0" class="sold-out-badge">SOLD OUT</div>
-      <img :src="product.image_url" :alt="product.name" :class="{ 'out-of-stock': product.stock === 0 }" />
+      <div v-if="totalStock === 0" class="sold-out-badge">SOLD OUT</div>
+      <img :src="product.image_url" :alt="product.name" :class="{ 'out-of-stock': totalStock === 0 }" />
     </div>
     <div class="product-info">
       <div class="product-category">{{ product.category }}</div>
@@ -15,8 +15,8 @@
       <div class="product-footer">
         <div class="product-price">${{ product.price.toFixed(2) }}</div>
       </div>
-      <div v-if="product.stock > 0 && product.stock <= 5" class="stock-warning">
-        Only {{ product.stock }} left!
+      <div v-if="totalStock > 0 && totalStock <= 5" class="stock-warning">
+        Only {{ totalStock }} left!
       </div>
     </div>
   </div>
@@ -29,6 +29,47 @@ const props = defineProps({
 
 const { user } = useAuth()
 
+// Calculate total stock from colors if available, otherwise use product stock
+const totalStock = computed(() => {
+  if (props.product.colors) {
+    try {
+      const colors = JSON.parse(props.product.colors)
+      return colors.reduce((sum, c) => sum + (c.stock || 0), 0)
+    } catch {
+      return props.product.stock || 0
+    }
+  }
+  return props.product.stock || 0
+})
+
+// Local reactive state for instant UI feedback
+const isFavorite = ref(props.product.is_favorite || false)
+
+// Only show as favorite if user is logged in AND product is favorite
+const isFavoriteDisplay = computed(() => {
+  if (!user.value) return false // Not logged in = always false
+  return isFavorite.value
+})
+
+// Sync with prop changes (only if user is logged in)
+watch(() => props.product.is_favorite, (newVal) => {
+  if (user.value) {
+    isFavorite.value = newVal || false
+  } else {
+    isFavorite.value = false
+  }
+})
+
+// Watch user changes - reset favorite state when user logs out
+watch(() => user.value, (newUser) => {
+  if (!newUser) {
+    isFavorite.value = false
+  } else {
+    // User logged in - sync with product state
+    isFavorite.value = props.product.is_favorite || false
+  }
+})
+
 const toggleFav = async () => {
   // Check if user is logged in
   if (!user.value) {
@@ -38,14 +79,23 @@ const toggleFav = async () => {
   }
   
   // Toggle immediately for instant feedback
-  const previousState = props.product.is_favorite
-  props.product.is_favorite = !props.product.is_favorite
+  const previousState = isFavorite.value
+  isFavorite.value = !isFavorite.value
   
   try {
-    await $fetch(`http://localhost:8000/products/${props.product.id}/favorite`, { method: 'POST' })
+    const result = await $fetch(`http://localhost:8000/products/${props.product.id}/favorite`, { method: 'POST' })
+    // Sync the actual state from server
+    isFavorite.value = result.is_favorite
+    
+    if (isFavorite.value) {
+      useToast().success('Added to favorites!')
+    } else {
+      useToast().info('Removed from favorites')
+    }
   } catch (e) {
     // Revert on error
-    props.product.is_favorite = previousState
+    isFavorite.value = previousState
+    useToast().error('Failed to update favorites')
     console.error(e)
   }
 }
@@ -109,6 +159,14 @@ const toggleFav = async () => {
 
 .fav-btn:hover {
   transform: scale(1.1);
+}
+
+.fav-btn.is-fav {
+  background: #FEE2E2;
+}
+
+.fav-btn.is-fav:hover {
+  background: #FECACA;
 }
 
 .sold-out-badge {

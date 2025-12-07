@@ -57,7 +57,13 @@
         <div v-if="expandedOrder === order.id" class="order-details">
           <!-- Delivery Info -->
           <div class="detail-section">
-            <h3 class="detail-title">📍 Delivery Info</h3>
+            <h3 class="detail-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Delivery Info
+            </h3>
             <div class="detail-grid">
               <div class="detail-item">
                 <span class="detail-label">Recipient</span>
@@ -80,7 +86,13 @@
           
           <!-- Payment Info -->
           <div class="detail-section">
-            <h3 class="detail-title">💳 Payment</h3>
+            <h3 class="detail-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                <line x1="1" y1="10" x2="23" y2="10"></line>
+              </svg>
+              Payment
+            </h3>
             <div class="payment-badge" :class="order.payment_method">
               {{ order.payment_method === 'cash' ? 'Cash on Delivery' : 'Card Payment' }}
             </div>
@@ -88,7 +100,14 @@
           
           <!-- Order Items -->
           <div class="detail-section">
-            <h3 class="detail-title">📦 Items ({{ order.items?.length || 0 }})</h3>
+            <h3 class="detail-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              Items ({{ order.items?.length || 0 }})
+            </h3>
             <div class="items-list">
               <div v-for="(item, idx) in order.items" :key="idx" class="order-item">
                 <img :src="item.product_image" :alt="item.product_name" class="item-image" />
@@ -107,7 +126,15 @@
           
           <!-- Notes -->
           <div v-if="order.notes" class="detail-section">
-            <h3 class="detail-title">📝 Notes</h3>
+            <h3 class="detail-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              Notes
+            </h3>
             <p class="notes-text">{{ order.notes }}</p>
           </div>
         </div>
@@ -391,6 +418,14 @@ const updateStatus = async (id, newStatus) => {
   font-weight: 700;
   margin-bottom: 12px;
   color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-title svg {
+  flex-shrink: 0;
+  color: #6B7280;
 }
 
 .detail-grid {
