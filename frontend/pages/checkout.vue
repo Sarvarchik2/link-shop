@@ -10,7 +10,7 @@
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
       </button>
-      <h1 class="page-title">Checkout</h1>
+      <h1 class="page-title">Buyurtma berish</h1>
       <div class="spacer"></div>
     </header>
 
@@ -25,38 +25,38 @@
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                 <circle cx="12" cy="10" r="3"></circle>
               </svg>
-              Delivery Address
+              Yetkazib berish manzili
             </h2>
             
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">Recipient Name</label>
-                <input v-model="form.recipient_name" type="text" class="form-input" placeholder="Full name" required />
+                <label class="form-label">Qabul qiluvchi ismi</label>
+                <input v-model="form.recipient_name" type="text" class="form-input" placeholder="To'liq ism" required />
               </div>
               
               <div class="form-group">
-                <label class="form-label">Phone Number</label>
+                <label class="form-label">Telefon raqami</label>
                 <input v-model="form.delivery_phone" type="tel" class="form-input" placeholder="+998 90 123 45 67" required />
               </div>
             </div>
             
             <div class="form-group">
-              <label class="form-label">City</label>
+              <label class="form-label">Shahar</label>
               <select v-model="form.delivery_city" class="form-input" required>
-                <option value="">Select city</option>
-                <option value="Tashkent">Tashkent</option>
-                <option value="Samarkand">Samarkand</option>
-                <option value="Bukhara">Bukhara</option>
+                <option value="">Shaharni tanlang</option>
+                <option value="Toshkent">Toshkent</option>
+                <option value="Samarqand">Samarqand</option>
+                <option value="Buxoro">Buxoro</option>
                 <option value="Namangan">Namangan</option>
-                <option value="Andijan">Andijan</option>
-                <option value="Fergana">Fergana</option>
-                <option value="Other">Other</option>
+                <option value="Andijon">Andijon</option>
+                <option value="Farg'ona">Farg'ona</option>
+                <option value="Boshqa">Boshqa</option>
               </select>
             </div>
             
             <div class="form-group">
-              <label class="form-label">Delivery Address</label>
-              <textarea v-model="form.delivery_address" class="form-input" rows="3" placeholder="Street, house, apartment..." required></textarea>
+              <label class="form-label">Yetkazib berish manzili</label>
+              <textarea v-model="form.delivery_address" class="form-input" rows="3" placeholder="Ko'cha, uy, kvartira..." required></textarea>
             </div>
           </section>
 
@@ -67,7 +67,7 @@
                 <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
                 <line x1="1" y1="10" x2="23" y2="10"></line>
               </svg>
-              Payment Method
+              To'lov usuli
             </h2>
             
             <div class="payment-options">
@@ -75,8 +75,8 @@
                 <input type="radio" v-model="form.payment_method" value="cash" />
                 <div class="payment-icon">💵</div>
                 <div class="payment-info">
-                  <span class="payment-name">Cash on Delivery</span>
-                  <span class="payment-desc">Pay when you receive</span>
+                  <span class="payment-name">Naqd pul</span>
+                  <span class="payment-desc">Qabul qilganda to'lang</span>
                 </div>
                 <div class="payment-check">
                   <svg v-if="form.payment_method === 'cash'" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -94,8 +94,8 @@
                   </svg>
                 </div>
                 <div class="payment-info">
-                  <span class="payment-name">Card Payment</span>
-                  <span class="payment-desc">Pay with card on delivery</span>
+                  <span class="payment-name">Karta orqali</span>
+                  <span class="payment-desc">Yetkazib berishda karta bilan to'lang</span>
                 </div>
                 <div class="payment-check">
                   <svg v-if="form.payment_method === 'card'" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -115,16 +115,16 @@
                 <line x1="16" y1="13" x2="8" y2="13"></line>
                 <line x1="16" y1="17" x2="8" y2="17"></line>
               </svg>
-              Notes (Optional)
+              Izohlar (ixtiyoriy)
             </h2>
-            <textarea v-model="form.notes" class="form-input" rows="2" placeholder="Any special instructions..."></textarea>
+            <textarea v-model="form.notes" class="form-input" rows="2" placeholder="Maxsus ko'rsatmalar..."></textarea>
           </section>
         </div>
 
         <!-- Right Column - Summary (Desktop) -->
         <div class="checkout-summary">
           <div class="summary-card">
-            <h2 class="summary-title">Order Summary</h2>
+            <h2 class="summary-title">Buyurtma xulosasi</h2>
             
             <div class="summary-items">
               <div v-for="item in items" :key="item.cartKey" class="summary-item">
@@ -141,22 +141,22 @@
             
             <div class="summary-totals">
               <div class="summary-row">
-                <span>Subtotal</span>
+                <span>Oraliq jami</span>
                 <span>${{ totalPrice.toFixed(2) }}</span>
               </div>
               <div class="summary-row">
-                <span>Shipping</span>
-                <span class="free">Free</span>
+                <span>Yetkazib berish</span>
+                <span class="free">Bepul</span>
               </div>
               <div class="summary-row total">
-                <span>Total</span>
+                <span>Jami</span>
                 <span>${{ totalPrice.toFixed(2) }}</span>
               </div>
             </div>
 
             <!-- Desktop Place Order Button -->
             <button @click="placeOrder" class="btn-place-order desktop-btn" :disabled="loading || !isFormValid">
-              {{ loading ? 'Processing...' : 'PLACE ORDER' }}
+              {{ loading ? 'Jarayonda...' : 'BUYURTMA BERISH' }}
             </button>
           </div>
         </div>
@@ -164,7 +164,7 @@
 
       <!-- Mobile Order Summary -->
       <section class="checkout-section order-summary-mobile">
-        <h2 class="section-title">Order Summary</h2>
+        <h2 class="section-title">Buyurtma xulosasi</h2>
         
         <div class="summary-items">
           <div v-for="item in items" :key="item.cartKey" class="summary-item">
@@ -181,15 +181,15 @@
         
         <div class="summary-totals">
           <div class="summary-row">
-            <span>Subtotal</span>
+            <span>Oraliq jami</span>
             <span>${{ totalPrice.toFixed(2) }}</span>
           </div>
           <div class="summary-row">
-            <span>Shipping</span>
-            <span class="free">Free</span>
+            <span>Yetkazib berish</span>
+            <span class="free">Bepul</span>
           </div>
           <div class="summary-row total">
-            <span>Total</span>
+            <span>Jami</span>
             <span>${{ totalPrice.toFixed(2) }}</span>
           </div>
         </div>
@@ -199,7 +199,7 @@
     <!-- Mobile Footer -->
     <footer class="checkout-footer mobile-footer">
       <button @click="placeOrder" class="btn-place-order" :disabled="loading || !isFormValid">
-        {{ loading ? 'Processing...' : 'PLACE ORDER' }}
+        {{ loading ? 'Jarayonda...' : 'BUYURTMA BERISH' }}
       </button>
     </footer>
   </div>
@@ -240,7 +240,7 @@ const toast = useToast()
 
 const placeOrder = async () => {
   if (!isFormValid.value) {
-    toast.warning('Please fill in all required fields')
+    toast.warning('Iltimos, barcha majburiy maydonlarni to\'ldiring')
     return
   }
   
@@ -264,11 +264,11 @@ const placeOrder = async () => {
     })
 
     clearCart()
-    toast.success('Order placed successfully!')
+    toast.success('Buyurtma muvaffaqiyatli berildi!')
     navigateTo('/orders')
   } catch (e) {
     console.error(e)
-    toast.error('Failed to place order. Please try again.')
+    toast.error('Buyurtma berishda xatolik. Iltimos, qayta urinib ko\'ring.')
   } finally {
     loading.value = false
   }

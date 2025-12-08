@@ -10,7 +10,7 @@
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
       </button>
-      <h1 class="page-title">My Orders</h1>
+      <h1 class="page-title">Mening buyurtmalarim</h1>
       <div class="spacer"></div>
     </header>
 
@@ -24,7 +24,7 @@
         <input 
           v-model="searchQuery"
           type="text" 
-          placeholder="Search by order ID..." 
+          placeholder="Buyurtma ID bo'yicha qidirish..." 
           class="search-input"
         />
     </div>
@@ -82,7 +82,7 @@
       <!-- Loading State -->
       <div v-if="pending" class="loading-state">
         <div class="spinner"></div>
-        <p>Loading orders...</p>
+        <p>Buyurtmalar yuklanmoqda...</p>
     </div>
 
       <!-- Empty State -->
@@ -94,9 +94,9 @@
             <path d="M16 10a4 4 0 0 1-8 0"></path>
           </svg>
         </div>
-        <h2 class="empty-title">No orders yet</h2>
-        <p class="empty-text">Your orders will appear here once you make a purchase</p>
-        <NuxtLink to="/products" class="btn-shop">Start Shopping</NuxtLink>
+        <h2 class="empty-title">Hozircha buyurtmalar yo'q</h2>
+        <p class="empty-text">Xarid qilganingizdan so'ng buyurtmalaringiz shu yerda ko'rinadi</p>
+        <NuxtLink to="/products" class="btn-shop">Xarid qilishni boshlash</NuxtLink>
       </div>
 
       <!-- Orders List -->
@@ -110,7 +110,7 @@
           <!-- Order Header -->
           <div class="order-header" @click="toggleOrder(order.id)">
             <div class="order-info">
-              <span class="order-id">Order #{{ order.id }}</span>
+              <span class="order-id">Buyurtma #{{ order.id }}</span>
               <span class="order-date">{{ formatDate(order.created_at) }}</span>
             </div>
             <div class="order-status" :class="order.status">
@@ -128,23 +128,23 @@
                   <span v-if="item.selected_color" class="option-tag color">{{ item.selected_color }}</span>
                   <span v-if="item.selected_size" class="option-tag size">{{ item.selected_size }}</span>
                 </div>
-                <span class="item-qty">Qty: {{ item.quantity }}</span>
+                <span class="item-qty">Soni: {{ item.quantity }}</span>
               </div>
               <span class="item-price">${{ (item.price * item.quantity).toFixed(2) }}</span>
             </div>
             <div v-if="order.items?.length > 2" class="more-items">
-              +{{ order.items.length - 2 }} more items
+              +{{ order.items.length - 2 }} ta mahsulot
             </div>
           </div>
 
           <!-- Order Footer -->
           <div class="order-footer">
             <div class="order-total">
-              <span class="total-label">Total</span>
+              <span class="total-label">Jami</span>
               <span class="total-value">${{ order.total_price.toFixed(2) }}</span>
             </div>
             <button class="expand-btn" @click="toggleOrder(order.id)">
-              {{ expandedOrder === order.id ? 'Hide Details' : 'View Details' }}
+              {{ expandedOrder === order.id ? 'Yashirish' : 'Batafsil' }}
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" :class="{ rotated: expandedOrder === order.id }">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
@@ -155,23 +155,23 @@
           <div v-if="expandedOrder === order.id" class="order-details">
             <!-- Timeline -->
             <div class="timeline-section">
-              <h3 class="section-label">Order Status</h3>
+              <h3 class="section-label">Buyurtma holati</h3>
               <div class="timeline">
                 <div class="timeline-item" :class="{ active: isStatusActive(order.status, 'pending'), completed: isStatusCompleted(order.status, 'pending') }">
                   <div class="timeline-dot"></div>
-                  <span>Order Placed</span>
+                  <span>Buyurtma berildi</span>
                 </div>
                 <div class="timeline-item" :class="{ active: isStatusActive(order.status, 'processing'), completed: isStatusCompleted(order.status, 'processing') }">
                   <div class="timeline-dot"></div>
-                  <span>Processing</span>
+                  <span>Jarayonda</span>
                 </div>
                 <div class="timeline-item" :class="{ active: isStatusActive(order.status, 'shipping'), completed: isStatusCompleted(order.status, 'shipping') }">
                   <div class="timeline-dot"></div>
-                  <span>Shipping</span>
+                  <span>Yetkazilmoqda</span>
                 </div>
                 <div class="timeline-item" :class="{ active: isStatusActive(order.status, 'delivered'), completed: isStatusCompleted(order.status, 'delivered') }">
                   <div class="timeline-dot"></div>
-                  <span>Delivered</span>
+                  <span>Yetkazildi</span>
                 </div>
               </div>
             </div>
@@ -183,7 +183,7 @@
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
-                Delivery Address
+                Yetkazib berish manzili
               </h3>
               <div class="delivery-info">
                 <p class="delivery-name">{{ order.recipient_name }}</p>
@@ -199,10 +199,10 @@
                   <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
                   <line x1="1" y1="10" x2="23" y2="10"></line>
                 </svg>
-                Payment Method
+                To'lov usuli
               </h3>
               <div class="payment-badge" :class="order.payment_method">
-                {{ order.payment_method === 'cash' ? 'Cash on Delivery' : 'Card Payment' }}
+                {{ order.payment_method === 'cash' ? 'Naqd pul' : 'Karta orqali' }}
           </div>
         </div>
 
@@ -214,7 +214,7 @@
                   <line x1="3" y1="6" x2="21" y2="6"></line>
                   <path d="M16 10a4 4 0 0 1-8 0"></path>
                 </svg>
-                Items ({{ order.items?.length || 0 }})
+                Mahsulotlar ({{ order.items?.length || 0 }})
               </h3>
               <div class="items-list">
                 <div v-for="(item, idx) in order.items" :key="idx" class="item-full">
@@ -225,7 +225,7 @@
                       <span v-if="item.selected_color" class="option-tag color">{{ item.selected_color }}</span>
                       <span v-if="item.selected_size" class="option-tag size">{{ item.selected_size }}</span>
                     </div>
-                    <span class="item-meta">Qty: {{ item.quantity }} × ${{ item.price.toFixed(2) }}</span>
+                    <span class="item-meta">Soni: {{ item.quantity }} × ${{ item.price.toFixed(2) }}</span>
                   </div>
                   <span class="item-total">${{ (item.price * item.quantity).toFixed(2) }}</span>
                 </div>
@@ -250,12 +250,12 @@ const { data: orders, pending } = await useFetch('http://localhost:8000/orders/m
 })
 
 const statuses = [
-  { value: 'all', label: 'All' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'processing', label: 'Processing' },
-  { value: 'shipping', label: 'Shipping' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'cancelled', label: 'Cancelled' }
+  { value: 'all', label: 'Hammasi' },
+  { value: 'pending', label: 'Kutilmoqda' },
+  { value: 'processing', label: 'Jarayonda' },
+  { value: 'shipping', label: 'Yetkazilmoqda' },
+  { value: 'delivered', label: 'Yetkazildi' },
+  { value: 'cancelled', label: 'Bekor qilindi' }
 ]
 
 const selectedStatus = ref('all')

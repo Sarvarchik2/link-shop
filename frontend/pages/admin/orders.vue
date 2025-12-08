@@ -1,7 +1,7 @@
 <template>
   <div class="orders-page">
     <div class="page-header">
-    <h1 class="page-title">Orders</h1>
+    <h1 class="page-title">Buyurtmalar</h1>
       <div class="filters">
         <button 
           v-for="status in statuses" 
@@ -19,7 +19,7 @@
     </div>
     
     <div v-if="!filteredOrders || filteredOrders.length === 0" class="empty-state">
-      <p>No orders found.</p>
+      <p>Buyurtmalar topilmadi.</p>
     </div>
     
     <div v-else class="orders-list">
@@ -41,11 +41,11 @@
                 class="status-select"
             :class="order.status"
               >
-                <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
-                <option value="shipping">Shipping</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
+                <option value="pending">Kutilmoqda</option>
+                <option value="processing">Jarayonda</option>
+                <option value="shipping">Yetkazilmoqda</option>
+            <option value="delivered">Yetkazildi</option>
+            <option value="cancelled">Bekor qilindi</option>
               </select>
           <button class="expand-btn" :class="{ expanded: expandedOrder === order.id }">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -62,23 +62,23 @@
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                 <circle cx="12" cy="10" r="3"></circle>
               </svg>
-              Delivery Info
+              Yetkazib berish
             </h3>
             <div class="detail-grid">
               <div class="detail-item">
-                <span class="detail-label">Recipient</span>
+                <span class="detail-label">Qabul qiluvchi</span>
                 <span class="detail-value">{{ order.recipient_name || 'N/A' }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">Phone</span>
+                <span class="detail-label">Telefon</span>
                 <span class="detail-value">{{ order.delivery_phone || 'N/A' }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">City</span>
+                <span class="detail-label">Shahar</span>
                 <span class="detail-value">{{ order.delivery_city || 'N/A' }}</span>
               </div>
               <div class="detail-item full-width">
-                <span class="detail-label">Address</span>
+                <span class="detail-label">Manzil</span>
                 <span class="detail-value">{{ order.delivery_address || 'N/A' }}</span>
               </div>
             </div>
@@ -91,10 +91,10 @@
                 <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
                 <line x1="1" y1="10" x2="23" y2="10"></line>
               </svg>
-              Payment
+              To'lov
             </h3>
             <div class="payment-badge" :class="order.payment_method">
-              {{ order.payment_method === 'cash' ? 'Cash on Delivery' : 'Card Payment' }}
+              {{ order.payment_method === 'cash' ? 'Naqd pul' : 'Karta orqali' }}
             </div>
           </div>
           
@@ -106,7 +106,7 @@
                 <line x1="3" y1="6" x2="21" y2="6"></line>
                 <path d="M16 10a4 4 0 0 1-8 0"></path>
               </svg>
-              Items ({{ order.items?.length || 0 }})
+              Mahsulotlar ({{ order.items?.length || 0 }})
             </h3>
             <div class="items-list">
               <div v-for="(item, idx) in order.items" :key="idx" class="order-item">
@@ -117,7 +117,7 @@
                     <span v-if="item.selected_color" class="item-option color">{{ item.selected_color }}</span>
                     <span v-if="item.selected_size" class="item-option size">{{ item.selected_size }}</span>
                   </div>
-                  <span class="item-meta">Qty: {{ item.quantity }} × ${{ item.price.toFixed(2) }}</span>
+                  <span class="item-meta">Soni: {{ item.quantity }} × ${{ item.price.toFixed(2) }}</span>
                 </div>
                 <span class="item-total">${{ (item.quantity * item.price).toFixed(2) }}</span>
               </div>
@@ -154,12 +154,12 @@ const expandedOrder = ref(null)
 const selectedStatus = ref('all')
 
 const statuses = [
-  { value: 'all', label: 'All' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'processing', label: 'Processing' },
-  { value: 'shipping', label: 'Shipping' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'cancelled', label: 'Cancelled' }
+  { value: 'all', label: 'Hammasi' },
+  { value: 'pending', label: 'Kutilmoqda' },
+  { value: 'processing', label: 'Jarayonda' },
+  { value: 'shipping', label: 'Yetkazilmoqda' },
+  { value: 'delivered', label: 'Yetkazildi' },
+  { value: 'cancelled', label: 'Bekor qilindi' }
 ]
 
 const { data: orders, refresh } = await useFetch('http://localhost:8000/admin/orders', {

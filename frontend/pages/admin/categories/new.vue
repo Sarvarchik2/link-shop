@@ -5,20 +5,20 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
-        Back
+        Orqaga
       </NuxtLink>
-      <h1 class="page-title">Add New Category</h1>
+      <h1 class="page-title">Yangi kategoriya qo'shish</h1>
     </div>
     
     <div class="form-card">
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
-          <label class="label">Category Name</label>
-          <input v-model="form.name" required class="input" placeholder="e.g. Sunglasses" />
+          <label class="label">Kategoriya nomi</label>
+          <input v-model="form.name" required class="input" placeholder="masalan, Quyoshdan himoya ko'zoynaklari" />
         </div>
 
         <div class="form-group">
-          <label class="label">Category Image</label>
+          <label class="label">Kategoriya rasmi</label>
           
           <!-- Image Preview -->
           <div v-if="imageUrl" class="image-preview">
@@ -46,8 +46,8 @@
                 <polyline points="17 8 12 3 7 8"></polyline>
                 <line x1="12" y1="3" x2="12" y2="15"></line>
               </svg>
-              <p>Drag & drop image or click to upload</p>
-              <span class="upload-hint">PNG, JPG up to 5MB</span>
+              <p>Rasmni sudrab tashlang yoki yuklash uchun bosing</p>
+              <span class="upload-hint">PNG, JPG 5MB gacha</span>
             </div>
             <input 
               ref="fileInput" 
@@ -58,7 +58,7 @@
             />
             
             <div class="url-input">
-              <span class="or-divider">or paste URL</span>
+              <span class="or-divider">yoki URL kiriting</span>
               <input 
                 v-model="imageUrl" 
                 class="input" 
@@ -69,9 +69,9 @@
         </div>
 
         <div class="form-actions">
-          <NuxtLink to="/admin/categories" class="btn btn-outline">Cancel</NuxtLink>
+          <NuxtLink to="/admin/categories" class="btn btn-outline">Bekor qilish</NuxtLink>
           <button type="submit" class="btn btn-primary" :disabled="loading || !form.name || !imageUrl">
-            {{ loading ? 'Creating...' : 'Create Category' }}
+            {{ loading ? 'Yaratilmoqda...' : 'Kategoriya yaratish' }}
           </button>
         </div>
       </form>
@@ -109,7 +109,7 @@ const handleDrop = async (event) => {
   if (file && file.type.startsWith('image/')) {
     await uploadFile(file)
   } else {
-    toast.error('Please upload an image file')
+    toast.error('Iltimos, rasm faylini yuklang')
   }
 }
 
@@ -123,16 +123,16 @@ const uploadFile = async (file) => {
       body: formData
     })
     imageUrl.value = response.url
-    toast.success('Image uploaded!')
+    toast.success('Rasm yuklandi!')
   } catch (e) {
     console.error(e)
-    toast.error('Failed to upload image')
+    toast.error('Rasmni yuklashda xatolik')
   }
 }
 
 const handleSubmit = async () => {
   if (!form.name || !imageUrl.value) {
-    toast.warning('Please fill all fields')
+    toast.warning('Iltimos, barcha maydonlarni to\'ldiring')
     return
   }
   
@@ -146,10 +146,10 @@ const handleSubmit = async () => {
         image_url: imageUrl.value
       }
     })
-    toast.success('Category created successfully!')
+    toast.success('Kategoriya muvaffaqiyatli yaratildi!')
     navigateTo('/admin/categories')
   } catch (e) {
-    toast.error('Failed to create category')
+    toast.error('Kategoriyani yaratishda xatolik')
   } finally {
     loading.value = false
   }

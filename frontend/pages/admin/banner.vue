@@ -1,11 +1,11 @@
 <template>
   <div class="banner-page">
-    <h1 class="page-title">Banner Settings</h1>
+    <h1 class="page-title">Banner sozlamalari</h1>
 
     <div class="banner-editor">
       <!-- Preview -->
       <div class="preview-section">
-        <h2 class="section-title">Preview</h2>
+        <h2 class="section-title">Ko'rinish</h2>
         <div class="banner-preview">
           <div class="preview-content">
             <div class="preview-badge">{{ form.badge_text }}</div>
@@ -21,52 +21,52 @@
 
       <!-- Form -->
       <div class="form-section">
-        <h2 class="section-title">Edit Banner</h2>
+        <h2 class="section-title">Bannerni tahrirlash</h2>
         
         <div class="form-group">
-          <label>Badge Text</label>
-          <input v-model="form.badge_text" type="text" placeholder="NEW ARRIVAL" />
+          <label>Badge matni</label>
+          <input v-model="form.badge_text" type="text" placeholder="YANGI KELDI" />
         </div>
 
         <div class="form-group">
-          <label>Title (use \n for line break)</label>
+          <label>Sarlavha (\n yangi qator uchun)</label>
           <input v-model="form.title" type="text" placeholder="Ray-Ban Meta Smart Glasses" />
         </div>
 
         <div class="form-group">
-          <label>Subtitle</label>
-          <input v-model="form.subtitle" type="text" placeholder="Starting from $299" />
+          <label>Qo'shimcha matn</label>
+          <input v-model="form.subtitle" type="text" placeholder="$299 dan boshlab" />
         </div>
 
         <div class="form-group">
-          <label>Button Text</label>
-          <input v-model="form.button_text" type="text" placeholder="Shop Now" />
+          <label>Tugma matni</label>
+          <input v-model="form.button_text" type="text" placeholder="Xarid qilish" />
         </div>
 
         <div class="form-group">
-          <label>Button Link</label>
+          <label>Tugma havolasi</label>
           <input v-model="form.button_link" type="text" placeholder="/products" />
         </div>
 
         <div class="form-group">
-          <label>Image URL</label>
+          <label>Rasm URL</label>
           <input v-model="form.image_url" type="text" placeholder="https://..." />
         </div>
 
         <div class="form-group">
-          <label>Or Upload Image</label>
+          <label>Yoki rasm yuklang</label>
           <input type="file" accept="image/*" @change="uploadImage" />
         </div>
 
         <div class="form-group checkbox-group">
           <label>
             <input type="checkbox" v-model="form.is_active" />
-            <span>Banner Active</span>
+            <span>Banner faol</span>
           </label>
         </div>
 
         <button @click="saveBanner" class="save-btn" :disabled="saving">
-          {{ saving ? 'Saving...' : 'Save Banner' }}
+          {{ saving ? 'Saqlanmoqda...' : 'Bannerni saqlash' }}
         </button>
       </div>
     </div>
@@ -125,9 +125,9 @@ const uploadImage = async (event) => {
       body: formData
     })
     form.value.image_url = result.url
-    useToast().success('Image uploaded!')
+    useToast().success('Rasm yuklandi!')
   } catch (e) {
-    useToast().error('Failed to upload image')
+    useToast().error('Rasmni yuklashda xatolik')
   }
 }
 
@@ -139,9 +139,9 @@ const saveBanner = async () => {
       headers: { Authorization: `Bearer ${token.value}` },
       body: form.value
     })
-    useToast().success('Banner saved!')
+    useToast().success('Banner saqlandi!')
   } catch (e) {
-    useToast().error('Failed to save banner')
+    useToast().error('Bannerni saqlashda xatolik')
   } finally {
     saving.value = false
   }

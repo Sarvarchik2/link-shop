@@ -2,8 +2,8 @@
   <div class="dashboard-page">
     <div class="dashboard-header">
       <div class="header-left">
-      <h1 class="page-title">Dashboard</h1>
-      <p class="page-subtitle">Welcome back! Here's what's happening with your store.</p>
+      <h1 class="page-title">Boshqaruv paneli</h1>
+      <p class="page-subtitle">Xush kelibsiz! Do'koningiz holati.</p>
       </div>
       <div class="header-right">
         <span class="current-date">{{ formatDate(new Date()) }}</span>
@@ -12,7 +12,7 @@
 
     <div v-if="pending" class="loading-state">
       <div class="spinner"></div>
-      <p>Loading stats...</p>
+      <p>Yuklanmoqda...</p>
     </div>
 
     <div v-else class="dashboard-content">
@@ -40,13 +40,13 @@
               </svg>
             </div>
             <div class="stat-comparison" v-if="periodStats.orders > 0">
-              <span class="comparison-value">{{ periodStats.orders }} orders</span>
+              <span class="comparison-value">{{ periodStats.orders }} ta buyurtma</span>
             </div>
           </div>
           <div class="stat-value">${{ periodStats.sales.toFixed(2) }}</div>
-          <div class="stat-label">{{ periodLabel }} Revenue</div>
+          <div class="stat-label">{{ periodLabel }} daromad</div>
           <div class="stat-note" v-if="stats?.orders_by_status?.cancelled > 0">
-            Excluding {{ stats.orders_by_status.cancelled }} cancelled
+            {{ stats.orders_by_status.cancelled }} ta bekor qilingan hisobga olinmagan
           </div>
         </div>
 
@@ -61,10 +61,10 @@
             </div>
           </div>
           <div class="stat-value">{{ stats?.total_orders || 0 }}</div>
-          <div class="stat-label">Total Orders</div>
+          <div class="stat-label">Jami buyurtmalar</div>
           <div class="stat-breakdown">
             <span class="breakdown-item pending" v-if="stats?.orders_by_status?.pending">
-              {{ stats.orders_by_status.pending }} pending
+              {{ stats.orders_by_status.pending }} ta kutilmoqda
             </span>
           </div>
         </div>
@@ -79,7 +79,7 @@
             </div>
           </div>
           <div class="stat-value">{{ stats?.total_users || 0 }}</div>
-          <div class="stat-label">Total Users</div>
+          <div class="stat-label">Jami foydalanuvchilar</div>
         </div>
 
         <div class="stat-card products-card">
@@ -93,13 +93,13 @@
             </div>
           </div>
           <div class="stat-value">{{ stats?.total_products || 0 }}</div>
-          <div class="stat-label">Total Products</div>
+          <div class="stat-label">Jami mahsulotlar</div>
         </div>
       </div>
 
       <!-- Orders by Status -->
       <div class="section orders-section">
-        <h2 class="section-title">Orders by Status</h2>
+        <h2 class="section-title">Status bo'yicha buyurtmalar</h2>
         <div class="status-grid">
           <div class="status-card pending">
             <div class="status-icon">
@@ -110,7 +110,7 @@
             </div>
             <div class="status-info">
               <span class="status-count">{{ stats?.orders_by_status?.pending || 0 }}</span>
-              <span class="status-label">Pending</span>
+              <span class="status-label">Kutilmoqda</span>
             </div>
             <div class="status-bar">
               <div class="status-fill" :style="{ width: getStatusPercent('pending') + '%' }"></div>
@@ -126,7 +126,7 @@
             </div>
             <div class="status-info">
               <span class="status-count">{{ stats?.orders_by_status?.processing || 0 }}</span>
-              <span class="status-label">Processing</span>
+              <span class="status-label">Jarayonda</span>
             </div>
             <div class="status-bar">
               <div class="status-fill" :style="{ width: getStatusPercent('processing') + '%' }"></div>
@@ -144,7 +144,7 @@
             </div>
             <div class="status-info">
               <span class="status-count">{{ stats?.orders_by_status?.shipping || 0 }}</span>
-              <span class="status-label">Shipping</span>
+              <span class="status-label">Yetkazilmoqda</span>
             </div>
             <div class="status-bar">
               <div class="status-fill" :style="{ width: getStatusPercent('shipping') + '%' }"></div>
@@ -160,7 +160,7 @@
             </div>
             <div class="status-info">
               <span class="status-count">{{ stats?.orders_by_status?.delivered || 0 }}</span>
-              <span class="status-label">Delivered</span>
+              <span class="status-label">Yetkazildi</span>
             </div>
             <div class="status-bar">
               <div class="status-fill" :style="{ width: getStatusPercent('delivered') + '%' }"></div>
@@ -177,7 +177,7 @@
             </div>
             <div class="status-info">
               <span class="status-count">{{ stats?.orders_by_status?.cancelled || 0 }}</span>
-              <span class="status-label">Cancelled</span>
+              <span class="status-label">Bekor qilindi</span>
             </div>
             <div class="status-bar">
               <div class="status-fill" :style="{ width: getStatusPercent('cancelled') + '%' }"></div>
@@ -188,70 +188,70 @@
 
       <!-- Period Comparison -->
       <div class="section comparison-section">
-        <h2 class="section-title">Performance Overview</h2>
+        <h2 class="section-title">Umumiy ko'rsatkichlar</h2>
         <div class="comparison-grid">
           <div class="comparison-card">
             <div class="comparison-header">
-              <span class="comparison-title">Today</span>
-              <span class="comparison-badge today">Live</span>
+              <span class="comparison-title">Bugun</span>
+              <span class="comparison-badge today">Jonli</span>
             </div>
             <div class="comparison-stats">
               <div class="comparison-stat">
                 <span class="comp-value">${{ stats?.today_sales?.toFixed(2) || '0.00' }}</span>
-                <span class="comp-label">Revenue</span>
+                <span class="comp-label">Daromad</span>
               </div>
               <div class="comparison-stat">
                 <span class="comp-value">{{ stats?.today_orders || 0 }}</span>
-                <span class="comp-label">Orders</span>
+                <span class="comp-label">Buyurtmalar</span>
               </div>
             </div>
           </div>
 
           <div class="comparison-card">
             <div class="comparison-header">
-              <span class="comparison-title">This Week</span>
+              <span class="comparison-title">Bu hafta</span>
             </div>
             <div class="comparison-stats">
               <div class="comparison-stat">
                 <span class="comp-value">${{ stats?.week_sales?.toFixed(2) || '0.00' }}</span>
-                <span class="comp-label">Revenue</span>
+                <span class="comp-label">Daromad</span>
               </div>
               <div class="comparison-stat">
                 <span class="comp-value">{{ stats?.week_orders || 0 }}</span>
-                <span class="comp-label">Orders</span>
+                <span class="comp-label">Buyurtmalar</span>
               </div>
             </div>
           </div>
 
           <div class="comparison-card">
             <div class="comparison-header">
-              <span class="comparison-title">This Month</span>
+              <span class="comparison-title">Bu oy</span>
             </div>
             <div class="comparison-stats">
               <div class="comparison-stat">
                 <span class="comp-value">${{ stats?.month_sales?.toFixed(2) || '0.00' }}</span>
-                <span class="comp-label">Revenue</span>
+                <span class="comp-label">Daromad</span>
               </div>
               <div class="comparison-stat">
                 <span class="comp-value">{{ stats?.month_orders || 0 }}</span>
-                <span class="comp-label">Orders</span>
+                <span class="comp-label">Buyurtmalar</span>
               </div>
             </div>
           </div>
 
           <div class="comparison-card total-card">
             <div class="comparison-header">
-              <span class="comparison-title">All Time</span>
-              <span class="comparison-badge total">Total</span>
+              <span class="comparison-title">Barcha vaqt</span>
+              <span class="comparison-badge total">Jami</span>
             </div>
             <div class="comparison-stats">
               <div class="comparison-stat">
                 <span class="comp-value">${{ stats?.total_sales?.toFixed(2) || '0.00' }}</span>
-                <span class="comp-label">Revenue</span>
+                <span class="comp-label">Daromad</span>
               </div>
               <div class="comparison-stat">
                 <span class="comp-value">{{ stats?.total_orders || 0 }}</span>
-                <span class="comp-label">Orders</span>
+                <span class="comp-label">Buyurtmalar</span>
               </div>
             </div>
           </div>
@@ -260,13 +260,13 @@
 
       <!-- Quick Actions -->
       <div class="section quick-actions">
-        <h2 class="section-title">Quick Actions</h2>
+        <h2 class="section-title">Tezkor amallar</h2>
         <div class="actions-grid">
           <NuxtLink to="/admin/products/new" class="action-card">
             <div class="action-icon add">➕</div>
             <div class="action-text">
-              <div class="action-title">Add Product</div>
-              <div class="action-subtitle">Create new product</div>
+              <div class="action-title">Mahsulot qo'shish</div>
+              <div class="action-subtitle">Yangi mahsulot yaratish</div>
             </div>
           </NuxtLink>
 
@@ -280,42 +280,42 @@
             </div>
             <div class="action-text">
               <div class="action-title">
-                Manage Orders
+                Buyurtmalarni boshqarish
                 <span v-if="stats?.orders_by_status?.pending" class="action-badge">{{ stats.orders_by_status.pending }}</span>
               </div>
-              <div class="action-subtitle">View and process orders</div>
+              <div class="action-subtitle">Buyurtmalarni ko'rish va qayta ishlash</div>
             </div>
           </NuxtLink>
 
           <NuxtLink to="/admin/users" class="action-card">
             <div class="action-icon users">👥</div>
             <div class="action-text">
-              <div class="action-title">View Users</div>
-              <div class="action-subtitle">{{ stats?.total_users || 0 }} customers</div>
+              <div class="action-title">Foydalanuvchilar</div>
+              <div class="action-subtitle">{{ stats?.total_users || 0 }} ta mijoz</div>
             </div>
           </NuxtLink>
 
           <NuxtLink to="/admin/categories" class="action-card">
             <div class="action-icon">📁</div>
             <div class="action-text">
-              <div class="action-title">Categories</div>
-              <div class="action-subtitle">Manage categories</div>
+              <div class="action-title">Kategoriyalar</div>
+              <div class="action-subtitle">Kategoriyalarni boshqarish</div>
             </div>
           </NuxtLink>
 
           <NuxtLink to="/admin/brands" class="action-card">
             <div class="action-icon">🏷️</div>
             <div class="action-text">
-              <div class="action-title">Brands</div>
-              <div class="action-subtitle">Manage brands</div>
+              <div class="action-title">Brendlar</div>
+              <div class="action-subtitle">Brendlarni boshqarish</div>
             </div>
           </NuxtLink>
 
           <NuxtLink to="/admin/products" class="action-card">
             <div class="action-icon">🛍️</div>
             <div class="action-text">
-              <div class="action-title">All Products</div>
-              <div class="action-subtitle">{{ stats?.total_products || 0 }} products</div>
+              <div class="action-title">Barcha mahsulotlar</div>
+              <div class="action-subtitle">{{ stats?.total_products || 0 }} ta mahsulot</div>
             </div>
           </NuxtLink>
         </div>
@@ -339,18 +339,18 @@ const { data: stats, pending } = await useFetch('http://localhost:8000/admin/sta
 const selectedPeriod = ref('all')
 
 const periods = [
-  { key: 'today', label: 'Today' },
-  { key: 'week', label: 'This Week' },
-  { key: 'month', label: 'This Month' },
-  { key: 'all', label: 'All Time' }
+  { key: 'today', label: 'Bugun' },
+  { key: 'week', label: 'Bu hafta' },
+  { key: 'month', label: 'Bu oy' },
+  { key: 'all', label: 'Barcha vaqt' }
 ]
 
 const periodLabel = computed(() => {
   switch (selectedPeriod.value) {
-    case 'today': return "Today's"
-    case 'week': return "This Week's"
-    case 'month': return "This Month's"
-    default: return 'Total'
+    case 'today': return "Bugungi"
+    case 'week': return "Bu haftaning"
+    case 'month': return "Bu oyning"
+    default: return 'Jami'
   }
 })
 
@@ -761,8 +761,6 @@ const formatDate = (date) => {
 .action-icon svg {
   width: 24px;
   height: 24px;
-}
-  background: #E5E7EB;
 }
 
 .action-text { flex: 1; }

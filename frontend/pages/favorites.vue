@@ -4,22 +4,22 @@
     
     <main class="container py-8">
       <div class="page-header">
-        <h1 class="page-title">Wishlist</h1>
-        <p class="page-subtitle">Your favorite products</p>
+        <h1 class="page-title">Sevimlilar</h1>
+        <p class="page-subtitle">Sizning sevimli mahsulotlaringiz</p>
       </div>
 
       <div v-if="pending" class="loading-state">
         <div class="spinner"></div>
-        <p>Loading...</p>
+        <p>Yuklanmoqda...</p>
       </div>
 
       <div v-else-if="favoriteProducts.length === 0" class="empty-state">
         <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
         </svg>
-        <h2>Your wishlist is empty</h2>
-        <p>Start adding products you love!</p>
-        <NuxtLink to="/" class="btn-explore">Explore Products</NuxtLink>
+        <h2>Sevimlilar ro'yxati bo'sh</h2>
+        <p>Yoqtirgan mahsulotlaringizni qo'shing!</p>
+        <NuxtLink to="/" class="btn-explore">Mahsulotlarni ko'rish</NuxtLink>
       </div>
 
       <div v-else class="products-grid">

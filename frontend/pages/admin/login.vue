@@ -3,36 +3,36 @@
     <div class="login-container">
       <div class="login-card">
         <div class="login-header">
-          <h1 class="login-title">Admin Login</h1>
+          <h1 class="login-title">Admin kirish</h1>
         </div>
         
         <form @submit.prevent="handleLogin" class="login-form">
           <div class="form-group">
-            <label class="form-label">Username</label>
+            <label class="form-label">Foydalanuvchi nomi</label>
             <input 
               v-model="username" 
               type="text" 
               required 
               class="form-input" 
-              placeholder="Enter your username"
+              placeholder="Foydalanuvchi nomini kiriting"
               autocomplete="username"
             />
           </div>
           
           <div class="form-group">
-            <label class="form-label">Password</label>
+            <label class="form-label">Parol</label>
             <input 
               v-model="password" 
               type="password" 
               required 
               class="form-input" 
-              placeholder="Enter your password"
+              placeholder="Parolni kiriting"
               autocomplete="current-password"
             />
           </div>
           
           <button type="submit" class="btn-submit" :disabled="loading">
-            <span v-if="!loading">Login to Dashboard</span>
+            <span v-if="!loading">Boshqaruv paneliga kirish</span>
             <span v-else class="loading-spinner">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
@@ -43,7 +43,7 @@
         
         <div class="form-footer">
           <NuxtLink to="/" class="footer-link">
-            ← Back to Shop
+            ← Do'konga qaytish
           </NuxtLink>
         </div>
       </div>
@@ -67,16 +67,16 @@ const handleLogin = async () => {
     await login(username.value, password.value, false)
     
     if (user.value && user.value.role === 'admin') {
-      useToast().success('Welcome back!')
+      useToast().success('Xush kelibsiz!')
       navigateTo('/admin')
     } else {
-      useToast().error('Access denied. Admin privileges required.')
+      useToast().error('Kirish rad etildi. Admin huquqlari talab qilinadi.')
       token.value = null
       user.value = null
     }
   } catch (e) {
     console.error(e)
-    useToast().error('Invalid username or password')
+    useToast().error('Noto\'g\'ri foydalanuvchi nomi yoki parol')
   } finally {
     loading.value = false
   }
@@ -229,6 +229,6 @@ const handleLogin = async () => {
   
   .login-title {
     font-size: 2rem;
-  }
+}
 }
 </style>

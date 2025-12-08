@@ -12,18 +12,18 @@
                 <span class="avatar-text">{{ getInitials }}</span>
               </div>
               <h1 class="profile-name">{{ fullName || 'User' }}</h1>
-              <p class="profile-role">{{ user?.role === 'admin' ? '👑 Administrator' : '🛒 Customer' }}</p>
+              <p class="profile-role">{{ user?.role === 'admin' ? '👑 Administrator' : '🛒 Mijoz' }}</p>
               
               <!-- Desktop Quick Stats -->
               <div class="profile-stats">
                 <div class="stat-item">
                   <span class="stat-value">#{{ user?.id }}</span>
-                  <span class="stat-label">User ID</span>
+                  <span class="stat-label">Foydalanuvchi ID</span>
                 </div>
                 <div class="stat-divider"></div>
                 <div class="stat-item">
-                  <span class="stat-value role-indicator" :class="user?.role">{{ user?.role === 'admin' ? 'Admin' : 'User' }}</span>
-                  <span class="stat-label">Role</span>
+                  <span class="stat-value role-indicator" :class="user?.role">{{ user?.role === 'admin' ? 'Admin' : 'Foydalanuvchi' }}</span>
+                  <span class="stat-label">Rol</span>
                 </div>
               </div>
             </div>
@@ -40,7 +40,7 @@
                   <line x1="16" y1="17" x2="8" y2="17"></line>
                 </svg>
               </div>
-              <span>My Orders</span>
+              <span>Buyurtmalarim</span>
             </NuxtLink>
             <NuxtLink to="/favorites" class="action-card">
               <div class="action-icon">
@@ -48,7 +48,7 @@
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                 </svg>
         </div>
-              <span>Favorites</span>
+              <span>Sevimlilar</span>
             </NuxtLink>
             <NuxtLink to="/cart" class="action-card">
               <div class="action-icon">
@@ -58,7 +58,7 @@
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
               </svg>
             </div>
-              <span>Cart</span>
+              <span>Savatcha</span>
             </NuxtLink>
             <NuxtLink to="/products" class="action-card">
               <div class="action-icon">
@@ -67,7 +67,7 @@
                   <line x1="1" y1="10" x2="23" y2="10"></line>
                 </svg>
             </div>
-              <span>Products</span>
+              <span>Mahsulotlar</span>
           </NuxtLink>
           </div>
         </div>
@@ -76,7 +76,7 @@
         <div class="profile-right">
           <!-- User Info Section -->
           <div class="info-section">
-            <h2 class="section-title">Personal Information</h2>
+            <h2 class="section-title">Shaxsiy ma'lumotlar</h2>
             
             <div class="info-card">
               <div class="info-item">
@@ -87,7 +87,7 @@
                   </svg>
                 </div>
                 <div class="info-content">
-                  <span class="info-label">First Name</span>
+                  <span class="info-label">Ism</span>
                   <span class="info-value">{{ user?.first_name || '—' }}</span>
                 </div>
               </div>
@@ -100,7 +100,7 @@
                   </svg>
                 </div>
                 <div class="info-content">
-                  <span class="info-label">Last Name</span>
+                  <span class="info-label">Familiya</span>
                   <span class="info-value">{{ user?.last_name || '—' }}</span>
                 </div>
               </div>
@@ -112,7 +112,7 @@
                   </svg>
                 </div>
                 <div class="info-content">
-                  <span class="info-label">Phone Number</span>
+                  <span class="info-label">Telefon raqam</span>
                   <span class="info-value">{{ user?.phone || '—' }}</span>
                 </div>
               </div>
@@ -124,9 +124,9 @@
               </svg>
             </div>
                 <div class="info-content">
-                  <span class="info-label">Account Type</span>
+                  <span class="info-label">Hisob turi</span>
                   <span class="info-value role-badge" :class="user?.role">
-                    {{ user?.role === 'admin' ? 'Administrator' : 'Customer' }}
+                    {{ user?.role === 'admin' ? 'Administrator' : 'Mijoz' }}
                   </span>
                 </div>
               </div>
@@ -141,7 +141,7 @@
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
-              Admin Panel
+              Admin panel
           </NuxtLink>
 
             <!-- Logout Button -->
@@ -151,7 +151,7 @@
                 <polyline points="16 17 21 12 16 7"></polyline>
                 <line x1="21" y1="12" x2="9" y2="12"></line>
               </svg>
-              Log Out
+              Chiqish
             </button>
             </div>
 

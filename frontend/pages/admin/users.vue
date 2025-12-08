@@ -1,19 +1,19 @@
 <template>
   <div class="users-page">
-    <h1 class="page-title">Users</h1>
+    <h1 class="page-title">Foydalanuvchilar</h1>
     
     <div class="users-stats">
       <div class="stat-card">
         <span class="stat-value">{{ users?.length || 0 }}</span>
-        <span class="stat-label">Total Users</span>
+        <span class="stat-label">Jami foydalanuvchilar</span>
       </div>
       <div class="stat-card">
         <span class="stat-value">{{ adminCount }}</span>
-        <span class="stat-label">Admins</span>
+        <span class="stat-label">Adminlar</span>
       </div>
       <div class="stat-card">
         <span class="stat-value">{{ userCount }}</span>
-        <span class="stat-label">Customers</span>
+        <span class="stat-label">Mijozlar</span>
       </div>
     </div>
     
@@ -24,7 +24,7 @@
         </div>
         <div class="user-info">
           <div class="user-name">
-            {{ user.first_name || 'No name' }} {{ user.last_name || '' }}
+            {{ user.first_name || 'Ism yo\'q' }} {{ user.last_name || '' }}
               <span class="role-badge" :class="user.role">{{ user.role }}</span>
           </div>
           <div class="user-phone">{{ user.phone }}</div>
@@ -39,22 +39,22 @@
         <!-- Expanded Details -->
         <div v-if="expandedUser === user.id" class="user-details" @click.stop>
           <div class="detail-section">
-            <h4 class="detail-title">Contact Information</h4>
+            <h4 class="detail-title">Aloqa ma'lumotlari</h4>
             <div class="detail-grid">
               <div class="detail-item">
-                <span class="detail-label">Phone</span>
+                <span class="detail-label">Telefon</span>
                 <span class="detail-value">{{ user.phone }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">First Name</span>
+                <span class="detail-label">Ism</span>
                 <span class="detail-value">{{ user.first_name || '-' }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">Last Name</span>
+                <span class="detail-label">Familiya</span>
                 <span class="detail-value">{{ user.last_name || '-' }}</span>
               </div>
               <div class="detail-item">
-                <span class="detail-label">Role</span>
+                <span class="detail-label">Rol</span>
                 <span class="detail-value">{{ user.role }}</span>
               </div>
             </div>
@@ -62,10 +62,10 @@
           
           <div class="detail-actions">
             <button v-if="user.role !== 'admin'" class="btn-action promote" @click="promoteUser(user.id)">
-              Make Admin
+              Admin qilish
             </button>
             <button v-if="user.role === 'admin' && user.phone !== 'admin'" class="btn-action demote" @click="demoteUser(user.id)">
-              Remove Admin
+              Adminlikni olib tashlash
             </button>
           </div>
         </div>
@@ -103,12 +103,12 @@ const toggleUser = (userId) => {
 
 const promoteUser = async (userId) => {
   // This would need a backend endpoint to update user role
-  useToast().info('Feature coming soon: Promote user to admin')
+  useToast().info('Tez orada: Foydalanuvchini admin qilish')
 }
 
 const demoteUser = async (userId) => {
   // This would need a backend endpoint to update user role
-  useToast().info('Feature coming soon: Remove admin role')
+  useToast().info('Tez orada: Admin rolini olib tashlash')
 }
 </script>
 
@@ -179,7 +179,7 @@ const demoteUser = async (userId) => {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #000000 0%, #0e0e0e 100%);
   color: white;
   display: flex;
   align-items: center;

@@ -7,52 +7,52 @@
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
       </NuxtLink>
-      <h1 class="page-title">Add New Product</h1>
+      <h1 class="page-title">Yangi mahsulot qo'shish</h1>
     </div>
     
     <div class="form-card">
       <form @submit.prevent="handleSubmit">
         <div class="form-section">
-          <h2 class="section-title">Basic Information</h2>
+          <h2 class="section-title">Asosiy ma'lumotlar</h2>
           
           <div class="form-row">
             <div class="form-group">
-              <label class="label">Product Name</label>
-              <input v-model="form.name" required class="input" placeholder="e.g. Ray-Ban Wayfarer" />
+              <label class="label">Mahsulot nomi</label>
+              <input v-model="form.name" required class="input" placeholder="masalan, Ray-Ban Wayfarer" />
             </div>
             
             <div class="form-group">
-              <label class="label">Price ($)</label>
+              <label class="label">Narx ($)</label>
               <input v-model.number="form.price" type="number" step="0.01" required class="input" placeholder="0.00" />
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label class="label">Brand</label>
+              <label class="label">Brend</label>
               <select v-model="form.brand" required class="input">
-                <option value="">Select Brand</option>
+                <option value="">Brendni tanlang</option>
                 <option v-for="brand in brands" :key="brand.id" :value="brand.name">{{ brand.name }}</option>
               </select>
             </div>
             
             <div class="form-group">
-              <label class="label">Category</label>
+              <label class="label">Kategoriya</label>
               <select v-model="form.category" required class="input">
-                <option value="">Select Category</option>
+                <option value="">Kategoriyani tanlang</option>
                 <option v-for="category in categories" :key="category.id" :value="category.name">{{ category.name }}</option>
               </select>
             </div>
           </div>
 
           <div class="form-group">
-            <label class="label">Description</label>
-            <textarea v-model="form.description" rows="4" required class="input" placeholder="Product description..."></textarea>
+            <label class="label">Tavsif</label>
+            <textarea v-model="form.description" rows="4" required class="input" placeholder="Mahsulot tavsifi..."></textarea>
           </div>
         </div>
 
         <div class="form-section">
-          <h2 class="section-title">Images</h2>
+          <h2 class="section-title">Rasmlar</h2>
           
           <!-- Image Upload Area -->
           <div class="images-upload-area">
@@ -73,7 +73,7 @@
                     ✕
                   </button>
                 </div>
-                <span v-if="index === 0" class="main-badge">Main</span>
+                <span v-if="index === 0" class="main-badge">Asosiy</span>
               </div>
             </div>
             
@@ -93,17 +93,17 @@
                   <polyline points="17 8 12 3 7 8"></polyline>
                   <line x1="12" y1="3" x2="12" y2="15"></line>
                 </svg>
-                <span class="upload-text">Click or drag images to upload</span>
-                <span class="upload-hint">PNG, JPG up to 5MB</span>
+                <span class="upload-text">Rasmlarni yuklash uchun bosing yoki sudrab tashlang</span>
+                <span class="upload-hint">PNG, JPG 5MB gacha</span>
               </div>
           </div>
 
             <!-- OR URL Input -->
             <div class="url-input-section">
-              <span class="divider-text">or add by URL</span>
+              <span class="divider-text">yoki URL orqali qo'shing</span>
               <div class="url-input-row">
                 <input v-model="imageUrl" class="input" placeholder="https://example.com/image.jpg" />
-                <button type="button" @click="addImageUrl" class="btn-add-url" :disabled="!imageUrl">Add</button>
+                <button type="button" @click="addImageUrl" class="btn-add-url" :disabled="!imageUrl">Qo'shish</button>
               </div>
             </div>
           </div>
@@ -113,34 +113,34 @@
               <circle cx="12" cy="12" r="10"></circle>
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
-            Uploading images...
+            Rasmlar yuklanmoqda...
           </p>
         </div>
 
         <div class="form-section">
-          <h2 class="section-title">Product Variants</h2>
-          <p class="help-text">Add combinations of size and color with stock quantities</p>
+          <h2 class="section-title">Mahsulot variantlari</h2>
+          <p class="help-text">O'lcham va rang kombinatsiyalarini zaxira miqdori bilan qo'shing</p>
           
           <div class="variants-list">
             <div v-for="(variant, index) in variants" :key="index" class="variant-row">
-              <input v-model="variant.size" class="input variant-size-input" placeholder="Size (e.g. M, L)" />
-              <input v-model="variant.color" class="input variant-color-input" placeholder="Color (e.g. Black)" />
-              <input v-model="variant.colorHex" type="color" class="color-picker" title="Color picker" />
-              <input v-model.number="variant.stock" type="number" min="0" class="input stock-input" placeholder="Stock" />
+              <input v-model="variant.size" class="input variant-size-input" placeholder="O'lcham (masalan, M, L)" />
+              <input v-model="variant.color" class="input variant-color-input" placeholder="Rang (masalan, Qora)" />
+              <input v-model="variant.colorHex" type="color" class="color-picker" title="Rang tanlash" />
+              <input v-model.number="variant.stock" type="number" min="0" class="input stock-input" placeholder="Zaxira" />
               <button type="button" @click="removeVariant(index)" class="btn-remove">✕</button>
             </div>
           </div>
           
           <button type="button" @click="addVariant" class="btn-add">
-            + Add Variant
+            + Variant qo'shish
           </button>
-          <p class="help-text">Each variant is a combination of size + color + stock quantity</p>
+          <p class="help-text">Har bir variant = o'lcham + rang + zaxira miqdori</p>
         </div>
 
         <div class="form-actions">
-          <NuxtLink to="/admin/products" class="btn btn-secondary">Cancel</NuxtLink>
+          <NuxtLink to="/admin/products" class="btn btn-secondary">Bekor qilish</NuxtLink>
           <button type="submit" class="btn btn-primary" :disabled="loading || uploadedImages.length === 0">
-            {{ loading ? 'Creating...' : 'Create Product' }}
+            {{ loading ? 'Yaratilmoqda...' : 'Mahsulot yaratish' }}
           </button>
         </div>
       </form>
@@ -246,7 +246,7 @@ const toast = useToast()
 
 const handleSubmit = async () => {
   if (uploadedImages.value.length === 0) {
-    toast.warning('Please add at least one image')
+    toast.warning('Iltimos, kamida bitta rasm qo\'shing')
     return
   }
   
@@ -274,11 +274,11 @@ const handleSubmit = async () => {
       body: productData
     })
     
-    toast.success('Product created successfully!')
+    toast.success('Mahsulot muvaffaqiyatli yaratildi!')
     navigateTo('/admin/products')
   } catch (e) {
     console.error(e)
-    toast.error('Failed to create product')
+    toast.error('Mahsulot yaratishda xatolik')
   } finally {
     loading.value = false
   }

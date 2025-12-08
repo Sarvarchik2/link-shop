@@ -10,7 +10,7 @@
           <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
         </button>
-      <h1 class="cart-title">Cart</h1>
+      <h1 class="cart-title">Savatcha</h1>
       <div class="header-spacer"></div>
     </header>
 
@@ -23,9 +23,9 @@
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
           </svg>
         </div>
-        <h2 class="empty-title">Your cart is empty</h2>
-        <p class="empty-text">Add some products to get started</p>
-        <NuxtLink to="/products" class="btn-shop">Continue Shopping</NuxtLink>
+        <h2 class="empty-title">Savatchangiz bo'sh</h2>
+        <p class="empty-text">Boshlash uchun mahsulotlar qo'shing</p>
+        <NuxtLink to="/products" class="btn-shop">Xaridni davom ettirish</NuxtLink>
       </div>
 
       <div v-else class="cart-items">
@@ -72,7 +72,7 @@
                 </button>
               </div>
               <!-- Desktop delete button -->
-              <button class="delete-btn-desktop" @click="removeItem(item.cartKey)" title="Remove item">
+              <button class="delete-btn-desktop" @click="removeItem(item.cartKey)" title="O'chirish">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6"></polyline>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -93,10 +93,10 @@
 
     <footer v-if="items.length > 0" class="cart-footer">
       <div class="total-section">
-        <span class="total-label">Grand Total</span>
+        <span class="total-label">Jami</span>
         <span class="total-price">${{ totalPrice.toFixed(2) }}</span>
       </div>
-      <button @click="handleCheckout" class="btn-checkout">CHECK OUT</button>
+      <button @click="handleCheckout" class="btn-checkout">BUYURTMA BERISH</button>
     </footer>
   </div>
 </template>
@@ -177,13 +177,13 @@ const toast = useToast()
 
 const handleCheckout = () => {
   if (!token.value) {
-    toast.warning('Please login to checkout')
+    toast.warning('Buyurtma berish uchun tizimga kiring')
     navigateTo('/login')
     return
   }
 
   if (items.value.length === 0) {
-    toast.warning('Your cart is empty')
+    toast.warning('Savatchangiz bo\'sh')
     return
   }
   

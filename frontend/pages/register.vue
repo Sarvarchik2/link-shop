@@ -3,37 +3,37 @@
     <div class="register-container">
       <div class="register-card">
         <div class="register-header">
-          <h1 class="register-title">Create Account</h1>
-          <p class="register-subtitle">Join us today</p>
+          <h1 class="register-title">Hisob yaratish</h1>
+          <p class="register-subtitle">Bugun bizga qo'shiling</p>
         </div>
         
         <form @submit.prevent="handleRegister" class="register-form">
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">First Name</label>
+              <label class="form-label">Ism</label>
               <input 
                 v-model="firstName" 
                 type="text" 
                 required 
                 class="form-input" 
-                placeholder="John" 
+                placeholder="Ali" 
               />
             </div>
             
             <div class="form-group">
-              <label class="form-label">Last Name</label>
+              <label class="form-label">Familiya</label>
               <input 
                 v-model="lastName" 
                 type="text" 
                 required 
                 class="form-input" 
-                placeholder="Doe" 
+                placeholder="Valiyev" 
               />
             </div>
           </div>
           
           <div class="form-group">
-            <label class="form-label">Phone Number</label>
+            <label class="form-label">Telefon raqam</label>
             <input 
               v-model="phone" 
               type="tel" 
@@ -44,7 +44,7 @@
           </div>
           
           <div class="form-group">
-            <label class="form-label">Password</label>
+            <label class="form-label">Parol</label>
             <input 
               v-model="password" 
               type="password" 
@@ -54,11 +54,11 @@
             />
           </div>
           
-          <button type="submit" class="btn-submit">Sign Up</button>
+          <button type="submit" class="btn-submit">Ro'yxatdan o'tish</button>
           
           <div class="form-footer">
-            <span class="footer-text">Already have an account?</span>
-            <NuxtLink to="/login" class="footer-link">Sign in</NuxtLink>
+            <span class="footer-text">Hisobingiz bormi?</span>
+            <NuxtLink to="/login" class="footer-link">Kirish</NuxtLink>
           </div>
         </form>
       </div>
@@ -81,7 +81,7 @@ const handleRegister = async () => {
   try {
   await register(phone.value, password.value, firstName.value, lastName.value)
   } catch (e) {
-    useToast().error('Registration failed. Phone number might already be registered.')
+    useToast().error('Ro\'yxatdan o\'tishda xatolik. Bu telefon raqam allaqachon ro\'yxatdan o\'tgan bo\'lishi mumkin.')
   }
 }
 </script>

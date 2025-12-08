@@ -14,9 +14,9 @@
 
         <!-- Navigation (Desktop only) -->
         <nav class="nav-links">
-          <NuxtLink to="/" class="nav-link">Home</NuxtLink>
-          <NuxtLink to="/products" class="nav-link">Products</NuxtLink>
-          <NuxtLink to="/orders" class="nav-link">Orders</NuxtLink>
+          <NuxtLink to="/" class="nav-link">Bosh sahifa</NuxtLink>
+          <NuxtLink to="/products" class="nav-link">Mahsulotlar</NuxtLink>
+          <NuxtLink to="/orders" class="nav-link">Buyurtmalar</NuxtLink>
         </nav>
 
         <!-- Actions -->
@@ -56,7 +56,7 @@
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
         <polyline points="9 22 9 12 15 12 15 22"></polyline>
       </svg>
-      <span>Home</span>
+      <span>Bosh sahifa</span>
     </NuxtLink>
     
     <NuxtLink to="/products" class="mobile-nav-item">
@@ -64,7 +64,7 @@
         <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
         <line x1="1" y1="10" x2="23" y2="10"></line>
       </svg>
-      <span>Products</span>
+      <span>Mahsulotlar</span>
     </NuxtLink>
     
     <NuxtLink to="/cart" class="mobile-nav-item cart-nav-item">
@@ -76,7 +76,7 @@
         </svg>
         <span v-if="totalItems > 0" class="cart-badge-mobile">{{ totalItems }}</span>
       </div>
-      <span>Cart</span>
+      <span>Savatcha</span>
     </NuxtLink>
     
     <NuxtLink to="/orders" class="mobile-nav-item">
@@ -86,14 +86,14 @@
         <line x1="16" y1="13" x2="8" y2="13"></line>
         <line x1="16" y1="17" x2="8" y2="17"></line>
       </svg>
-      <span>Orders</span>
+      <span>Buyurtmalar</span>
     </NuxtLink>
     
     <NuxtLink to="/favorites" class="mobile-nav-item">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
       </svg>
-      <span>Favorites</span>
+      <span>Sevimlilar</span>
     </NuxtLink>
   </nav>
 </template>

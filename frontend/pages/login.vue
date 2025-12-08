@@ -3,12 +3,12 @@
     <div class="login-container">
       <div class="login-card">
         <div class="login-header">
-          <h1 class="login-title">Login</h1>
+          <h1 class="login-title">Kirish</h1>
         </div>
         
         <form @submit.prevent="handleLogin" class="login-form">
           <div class="form-group">
-            <label class="form-label">Phone Number</label>
+            <label class="form-label">Telefon raqam</label>
             <input 
               v-model="phone" 
               type="tel" 
@@ -19,7 +19,7 @@
           </div>
           
           <div class="form-group">
-            <label class="form-label">Password</label>
+            <label class="form-label">Parol</label>
             <input 
               v-model="password" 
               type="password" 
@@ -29,11 +29,11 @@
             />
           </div>
           
-          <button type="submit" class="btn-submit">Sign In</button>
+          <button type="submit" class="btn-submit">Kirish</button>
           
           <div class="form-footer">
-            <span class="footer-text">Don't have an account?</span>
-            <NuxtLink to="/register" class="footer-link">Sign up</NuxtLink>
+            <span class="footer-text">Hisobingiz yo'qmi?</span>
+            <NuxtLink to="/register" class="footer-link">Ro'yxatdan o'tish</NuxtLink>
           </div>
         </form>
       </div>
@@ -54,7 +54,7 @@ const handleLogin = async () => {
   try {
   await login(phone.value, password.value)
   } catch (e) {
-    useToast().error('Invalid phone or password')
+    useToast().error('Telefon raqam yoki parol noto\'g\'ri')
   }
 }
 </script>

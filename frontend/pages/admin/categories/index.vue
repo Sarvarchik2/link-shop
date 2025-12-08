@@ -1,14 +1,14 @@
 <template>
   <div class="categories-page">
     <div class="flex justify-between items-center mb-8">
-      <h1 class="page-title mb-0">Categories</h1>
+      <h1 class="page-title mb-0">Kategoriyalar</h1>
       <NuxtLink to="/admin/categories/new" class="btn btn-primary">
-        + Add Category
+        + Kategoriya qo'shish
       </NuxtLink>
     </div>
     
     <div v-if="!categories || categories.length === 0" class="empty-state">
-      <p>No categories found</p>
+      <p>Kategoriyalar topilmadi</p>
     </div>
     
     <div v-else class="categories-grid">
@@ -23,7 +23,7 @@
               <polyline points="3 6 5 6 21 6"></polyline>
               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
-            Delete
+            O'chirish
           </button>
         </div>
       </div>
@@ -43,7 +43,7 @@ const { data: categories, refresh } = await useFetch('http://localhost:8000/cate
 })
 
 const deleteCategory = async (id) => {
-  if (!confirm('Are you sure you want to delete this category?')) return
+  if (!confirm('Haqiqatan ham bu kategoriyani o\'chirmoqchimisiz?')) return
   try {
     await $fetch(`http://localhost:8000/categories/${id}`, {
       method: 'DELETE',
@@ -51,7 +51,7 @@ const deleteCategory = async (id) => {
     })
     refresh()
   } catch (e) {
-    useToast().error('Failed to delete category')
+    useToast().error('Kategoriyani o\'chirishda xatolik')
   }
 }
 </script>

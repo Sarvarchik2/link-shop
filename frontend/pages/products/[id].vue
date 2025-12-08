@@ -5,7 +5,7 @@
     <main class="container py-8">
       <div v-if="pending" class="text-center py-12">
         <div class="loading-spinner"></div>
-        <p class="mt-4 text-gray-400">Loading...</p>
+        <p class="mt-4 text-gray-400">Yuklanmoqda...</p>
       </div>
 
       <div v-else-if="product" class="product-content">
@@ -34,27 +34,27 @@
             <div class="product-price">${{ product.price.toFixed(2) }}</div>
             <!-- Stock badge based on selected variant -->
             <template v-if="productVariants.length > 0">
-              <div v-if="totalColorStock === 0" class="stock-badge out-of-stock">SOLD OUT</div>
+              <div v-if="totalColorStock === 0" class="stock-badge out-of-stock">TUGADI</div>
               <div v-else-if="selectedColor && selectedSize && selectedVariant">
-                <div v-if="selectedVariant.stock === 0" class="stock-badge out-of-stock">{{ selectedSize }} / {{ selectedColor.name }} - SOLD OUT</div>
-                <div v-else-if="selectedVariant.stock <= 5" class="stock-badge low-stock">{{ selectedSize }} / {{ selectedColor.name }}: Only {{ selectedVariant.stock }} left!</div>
-                <div v-else class="stock-badge in-stock">{{ selectedSize }} / {{ selectedColor.name }}: In Stock ({{ selectedVariant.stock }})</div>
+                <div v-if="selectedVariant.stock === 0" class="stock-badge out-of-stock">{{ selectedSize }} / {{ selectedColor.name }} - TUGADI</div>
+                <div v-else-if="selectedVariant.stock <= 5" class="stock-badge low-stock">{{ selectedSize }} / {{ selectedColor.name }}: Faqat {{ selectedVariant.stock }} ta qoldi!</div>
+                <div v-else class="stock-badge in-stock">{{ selectedSize }} / {{ selectedColor.name }}: Mavjud ({{ selectedVariant.stock }})</div>
               </div>
-              <div v-else-if="selectedColor && !selectedSize" class="stock-badge select-color">Select size to see availability</div>
-              <div v-else-if="!selectedColor && selectedSize" class="stock-badge select-color">Select color to see availability</div>
-              <div v-else class="stock-badge select-color">Select size and color to see availability</div>
+              <div v-else-if="selectedColor && !selectedSize" class="stock-badge select-color">Mavjudligini ko'rish uchun o'lchamni tanlang</div>
+              <div v-else-if="!selectedColor && selectedSize" class="stock-badge select-color">Mavjudligini ko'rish uchun rangni tanlang</div>
+              <div v-else class="stock-badge select-color">Mavjudligini ko'rish uchun o'lcham va rangni tanlang</div>
             </template>
             <!-- Stock badge for products without variants -->
             <template v-else>
-              <div v-if="product.stock === 0" class="stock-badge out-of-stock">SOLD OUT</div>
-              <div v-else-if="product.stock <= 5" class="stock-badge low-stock">Only {{ product.stock }} left!</div>
-              <div v-else class="stock-badge in-stock">In Stock ({{ product.stock }})</div>
+            <div v-if="product.stock === 0" class="stock-badge out-of-stock">TUGADI</div>
+            <div v-else-if="product.stock <= 5" class="stock-badge low-stock">Faqat {{ product.stock }} ta qoldi!</div>
+            <div v-else class="stock-badge in-stock">Mavjud ({{ product.stock }})</div>
             </template>
           </div>
 
           <div v-if="productColors.length > 0" class="color-selector">
             <h3 class="section-title">
-              Select Color
+              Rangni tanlang
               <span v-if="productSizes.length > 0" class="required-badge">*</span>
             </h3>
             <div class="colors">
@@ -66,7 +66,7 @@
                 :style="{ '--color': color.hex }"
                 @click="selectColor(color)"
                 :disabled="color.stock === 0"
-                :title="color.stock === 0 ? 'Out of stock' : `${color.name} (${color.stock} available)`"
+                :title="color.stock === 0 ? 'Tugagan' : `${color.name} (${color.stock} ta mavjud)`"
               >
                 <span class="color-swatch"></span>
                 <span class="color-name">{{ color.name }}</span>
@@ -77,7 +77,7 @@
 
           <div v-if="productSizes.length > 0" class="size-selector">
             <h3 class="section-title">
-              Select Size
+              O'lchamni tanlang
               <span v-if="productColors.length > 0" class="required-badge">*</span>
             </h3>
             <div class="sizes">
@@ -88,7 +88,7 @@
                 :class="{ active: selectedSize === (size.name || size), 'out-of-stock': size.stock === 0 }"
                 @click="selectSize(size)"
                 :disabled="size.stock === 0"
-                :title="size.stock === 0 ? 'Out of stock' : `${size.name || size} (${size.stock || 'available'})`"
+                :title="size.stock === 0 ? 'Tugagan' : `${size.name || size} (${size.stock || 'mavjud'})`"
               >
                 {{ size.name || size }}
                 <span v-if="size.stock === 0" class="size-oos">✕</span>
@@ -97,17 +97,17 @@
           </div>
 
           <div class="product-description">
-            <h3 class="section-title">Description</h3>
+            <h3 class="section-title">Tavsif</h3>
             <p>{{ product.description }}</p>
           </div>
 
           <div class="product-meta">
             <div class="meta-item">
-              <span class="meta-label">Brand:</span>
+              <span class="meta-label">Brend:</span>
               <span class="meta-value">{{ product.brand }}</span>
             </div>
             <div class="meta-item">
-              <span class="meta-label">Category:</span>
+              <span class="meta-label">Kategoriya:</span>
               <span class="meta-value">{{ product.category }}</span>
             </div>
           </div>
@@ -339,21 +339,21 @@ const canAddToCart = computed(() => {
 })
 
 const buttonText = computed(() => {
-  if (!product.value) return 'Loading...'
+  if (!product.value) return 'Yuklanmoqda...'
   
   // If product has variants
   if (productVariants.value.length > 0) {
-    if (!selectedColor.value) return 'Select Color'
-    if (!selectedSize.value) return 'Select Size'
+    if (!selectedColor.value) return 'Rangni tanlang'
+    if (!selectedSize.value) return 'O\'lchamni tanlang'
     const variant = selectedVariant.value
-    if (!variant || (variant.stock || 0) === 0) return 'Out of Stock'
+    if (!variant || (variant.stock || 0) === 0) return 'Tugagan'
   }
   // No variants - check general stock
   else if (product.value.stock === 0) {
-    return 'Out of Stock'
+    return 'Tugagan'
   }
   
-  return 'ADD TO CART'
+  return 'SAVATGA QO\'SHISH'
 })
 
 const toast = useToast()
@@ -365,21 +365,21 @@ const addToCart = () => {
       if (productColors.value.length > 0) {
         // Has both sizes and colors
         if (!selectedColor.value) {
-          toast.warning('Please select a color')
+          toast.warning('Iltimos, rangni tanlang')
           return
         }
         if (selectedColor.value.stock === 0) {
-          toast.error('This color is out of stock')
+          toast.error('Bu rang tugagan')
           return
         }
         if (!selectedSize.value) {
-          toast.warning('Please select a size')
+          toast.warning('Iltimos, o\'lchamni tanlang')
           return
         }
       } else {
         // Has sizes but no colors
         if (!selectedSize.value) {
-          toast.warning('Please select a size')
+          toast.warning('Iltimos, o\'lchamni tanlang')
           return
         }
       }
@@ -387,11 +387,11 @@ const addToCart = () => {
     // If product has colors but no sizes, color is required
     else if (productColors.value.length > 0) {
       if (!selectedColor.value) {
-        toast.warning('Please select a color')
+        toast.warning('Iltimos, rangni tanlang')
         return
       }
       if (selectedColor.value.stock === 0) {
-        toast.error('This color is out of stock')
+        toast.error('Bu rang tugagan')
         return
       }
     }
@@ -403,12 +403,12 @@ const addToCart = () => {
     selectedColor: selectedColor.value || null,
     selectedSize: selectedSize.value || null
   })
-  toast.success('Added to cart!')
+  toast.success('Savatga qo\'shildi!')
 }
 
 const toggleFavorite = async () => {
   if (!user.value) {
-    toast.warning('Please login to add items to favorites')
+    toast.warning('Sevimlilar ro\'yxatiga qo\'shish uchun tizimga kiring')
     navigateTo('/login')
     return
   }
