@@ -2,7 +2,7 @@
   <div class="products-page">
     <AppHeader />
     
-    <main class="container py-6">
+    <main class="products-container">
       <!-- Header with title and filter toggle -->
       <div class="page-header">
         <h1 class="page-title">Barcha mahsulotlar</h1>
@@ -186,6 +186,18 @@ const filteredProducts = computed(() => {
   min-height: 100vh;
   background: #FAFAFA;
   padding-bottom: 100px;
+}
+
+.products-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+@media (max-width: 640px) {
+  .products-container {
+    padding: 16px;
+  }
 }
 
 .page-header {

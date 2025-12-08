@@ -117,11 +117,7 @@ const demoteUser = async (userId) => {
   width: 100%;
 }
 
-.page-title {
-  font-size: 2rem;
-  font-weight: 800;
-  margin-bottom: 24px;
-}
+/* Page title styles are now in admin layout */
 
 .users-stats {
   display: grid;

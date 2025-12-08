@@ -1,7 +1,7 @@
 <template>
   <div class="categories-page">
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="page-title mb-0">Kategoriyalar</h1>
+    <div class="page-header">
+      <h1 class="page-title">Kategoriyalar</h1>
       <NuxtLink to="/admin/categories/new" class="btn btn-primary">
         + Kategoriya qo'shish
       </NuxtLink>
@@ -57,10 +57,7 @@ const deleteCategory = async (id) => {
 </script>
 
 <style scoped>
-.page-title {
-  font-size: 2rem;
-  font-weight: 800;
-}
+/* Page title styles are now in admin layout */
 
 .btn {
   padding: 12px 24px;

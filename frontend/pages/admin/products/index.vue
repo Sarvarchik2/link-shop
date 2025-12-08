@@ -89,20 +89,7 @@ const deleteProduct = async (id) => {
   width: 100%;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  gap: 16px;
-}
-
-.page-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #111;
-  margin: 0;
-}
+/* Page header and title styles are now in admin layout */
 
 .btn {
   display: inline-flex;
@@ -308,16 +295,8 @@ const deleteProduct = async (id) => {
 
 /* Mobile always show actions */
 @media (max-width: 768px) {
-  .products-page {
-    padding: 16px;
-  }
-  
   .page-header {
     flex-wrap: wrap;
-  }
-  
-  .page-title {
-    font-size: 1.5rem;
   }
   
   .btn-text {

@@ -307,9 +307,68 @@ watch(() => route.path, () => {
   padding: 32px;
 }
 
+/* Unified page styles */
+.content :deep(.page-title) {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #111;
+  margin: 0;
+}
+
+.content :deep(.page-header) {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.content :deep(.page-header > .page-title) {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.content :deep(.page-header > .filters) {
+  flex: 1;
+  min-width: 0;
+}
+
+.content :deep(.page-header > .btn),
+.content :deep(.page-header > a.btn) {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   .content {
     padding: 20px 16px;
+    padding-bottom: 40px;
+  }
+  
+  .content :deep(.page-title) {
+    font-size: 1.5rem;
+  }
+  
+  .content :deep(.page-header) {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 20px;
+    gap: 16px;
+  }
+  
+  .content :deep(.page-header > .page-title) {
+    margin-bottom: 0;
+  }
+  
+  .content :deep(.page-header > .filters) {
+    width: 100%;
+  }
+  
+  .content :deep(.page-header > .btn),
+  .content :deep(.page-header > a.btn) {
+    width: 100%;
+    justify-content: center;
   }
 }
 

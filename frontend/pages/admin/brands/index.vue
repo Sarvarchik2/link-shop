@@ -1,7 +1,7 @@
 <template>
   <div class="brands-page">
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="page-title mb-0">Brendlar</h1>
+    <div class="page-header">
+      <h1 class="page-title">Brendlar</h1>
       <NuxtLink to="/admin/brands/new" class="btn btn-primary">
         + Brend qo'shish
       </NuxtLink>
@@ -57,10 +57,7 @@ const deleteBrand = async (id) => {
 </script>
 
 <style scoped>
-.page-title {
-  font-size: 2rem;
-  font-weight: 800;
-}
+/* Page title styles are now in admin layout */
 
 .btn {
   padding: 12px 24px;

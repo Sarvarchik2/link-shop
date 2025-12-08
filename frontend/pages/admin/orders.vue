@@ -213,15 +213,7 @@ const updateStatus = async (id, newStatus) => {
   width: 100%;
 }
 
-.page-header {
-  margin-bottom: 24px;
-}
-
-.page-title {
-  font-size: 2rem;
-  font-weight: 800;
-  margin-bottom: 16px;
-}
+/* Page header and title styles are now in admin layout */
 
 .filters {
   display: flex;
@@ -550,10 +542,6 @@ const updateStatus = async (id, newStatus) => {
 }
 
 @media (max-width: 768px) {
-  .page-title {
-    font-size: 1.5rem;
-    margin-bottom: 12px;
-  }
   
   .filters {
     overflow-x: auto;
